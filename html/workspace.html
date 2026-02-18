@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace</title>
+    <!-- We keep the link, but our new styles in <style> will override/enhance -->
+    <link rel="stylesheet" href="../css/workspace.css">
+    <style>
+        /* See CSS section below for the injected styles */
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="avatar">W</div>
+                    <span class="username">Workspace</span>
+                </div>
+            </div>
+
+            <!-- Visual Sidebar Search -->
+            <div class="sidebar-search" id="sidebar-search-trigger">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input-ghost" placeholder="Search..." id="sidebar-search-input">
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Overview / Favorites -->
+                <div class="nav-section">
+                    <div class="nav-header">Favorites</div>
+                    <!-- Added ID for JS targeting -->
+                    <a href="#" class="nav-item active" id="nav-overview">
+                        <span class="icon">🏠</span> Overview
+                    </a>
+                </div>
+                
+                <!-- Collapsible Private Section -->
+                <div class="nav-section collapsible-section" id="private-section">
+                    <!-- Added toggle functionality to header -->
+                    <div class="nav-header toggle-header">
+                        <span class="arrow-icon">▶</span> Private
+                    </div>
+                    <div class="section-content">
+                        <a href="#boards" class="nav-item" id="nav-boards">
+                            <span class="icon">📋</span> Boards
+                        </a>
+                        <a href="#notes" class="nav-item" id="nav-notes">
+                            <span class="icon">📝</span> Notes
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOP NAVBAR -->
+            <header class="top-nav">
+                <div class="breadcrumbs">
+                    <span class="crumb">Dashboard</span>
+                    <span class="separator">/</span>
+                    <h1 id="workspace-title" class="crumb current">Loading...</h1>
+                </div>
+                
+                <!-- Navbar Search & Actions -->
+                <div class="nav-actions">
+                    <!-- New Navbar Search -->
+                    <div class="navbar-search-wrapper">
+                        <span class="search-icon-sm">🔍</span>
+                        <input type="text" id="navbar-search-input" placeholder="Search boards & notes..." />
+                    </div>
+                    <button class="icon-btn">•••</button>
+                    <button id="delete-workspace-btn" class="btn-danger">
+    Delete Workspace
+</button>
+
+                </div>
+            </header>
+
+            <div class="scroll-container">
+                <div class="content-wrapper">
+
+                    <!-- BOARDS SECTION -->
+                    <section class="module-section" id="view-boards">
+                        <div class="section-header">
+                            <h2>Boards</h2>
+                        </div>
+
+                        <div class="creation-row">
+                            <div class="input-group">
+                                <input
+                                    type="text"
+                                    id="board-name-input"
+                                    class="notion-input"
+                                    placeholder="New board name..."
+                                />
+                                <button id="create-board-btn" class="btn-primary">New Board</button>
+                            </div>
+                        </div>
+
+                        <ul id="boards-list" class="grid-list">
+                            <!-- JS populates <li> items here -->
+                        </ul>
+                    </section>
+
+                    <div class="divider" id="main-divider"></div>
+
+                    <!-- NOTES SECTION -->
+                    <section class="module-section" id="view-notes">
+                        <div class="section-header">
+                            <h2>Notes</h2>
+                        </div>
+
+                        <div class="creation-card">
+                            <input
+                                type="text"
+                                id="note-title-input"
+                                class="notion-input title-input"
+                                placeholder="Note title"
+                            />
+                            <textarea
+                                id="note-content-input"
+                                class="notion-textarea"
+                                placeholder="Write something..."
+                                rows="3"
+                            ></textarea>
+                            <div class="card-actions">
+                                <button id="create-note-btn" class="btn-secondary">Add Note</button>
+                            </div>
+                        </div>
+
+                        <ul id="notes-list" class="row-list">
+                            <!-- JS populates <li> items here -->
+                        </ul>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Existing Javascript (Untouched) -->
+    <script src="../js/workspace.js"></script>
+
+    <!-- Enhanced Workspace Logic -->
+    <script src="../js/workspace-enhanced.js"></script>
+</body>
+</html>

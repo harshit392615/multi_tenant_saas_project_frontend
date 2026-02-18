@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Log in to your Nexus workspace.">
+    <title>Log in - Nexus</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+
+    <main class="login-container">
+        <div class="login-card">
+            <!-- Header Section -->
+            <header class="login-header">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+    <span class="toggle-icon">🌙</span>
+</button>
+
+                <div class="logo-wrapper">
+                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24">
+    <rect width="24" height="24" rx="6" fill="var(--logo-bg)"/>
+    <path d="M7 6V18H9.5L14.5 10V18H17V6H14.5L9.5 14V6H7Z"
+          fill="var(--logo-icon)"/>
+</svg>
+                </div>
+                <h1>Log in</h1>
+            </header>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form" novalidate>
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" autocomplete="email" required>
+                    <span class="error-msg" id="emailError"></span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                        <button type="button" id="togglePassword" class="toggle-btn" aria-label="Show password">
+                            <!-- Eye Icon -->
+                            <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <!-- Eye Off Icon (Hidden by default) -->
+                            <svg class="icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="error-msg" id="passwordError"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-primary">Continue</button>
+
+                <!-- Global Form Error -->
+                <div id="globalError" class="global-error" role="alert" aria-live="polite"></div>
+            </form>
+
+            <!-- Footer Links -->
+            <footer class="login-footer">
+                <a href="#" class="link-secondary">Forgot password?</a>
+                <div class="divider">
+                    <span>Don't have an account?</span>
+                    <a href="signup.html" class="link-primary">Sign up</a>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

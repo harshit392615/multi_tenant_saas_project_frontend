@@ -1,0 +1,154 @@
+:root {
+    --bg-body: #ffffff;
+    --bg-surface: #ffffff;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --border-color: #e0e0e0;
+    --primary: #111111;
+    --primary-text: #ffffff;
+    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --radius-lg: 12px;
+    --space-lg: 32px;
+    --space-md: 16px;
+}
+
+[data-theme="dark"] {
+    --bg-body: #191919;
+    --bg-surface: #202020;
+    --text-main: #eeeeee;
+    --text-muted: #aaaaaa;
+    --border-color: #333333;
+    --primary: #ffffff;
+    --primary-text: #000000;
+    --shadow-card: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: var(--bg-body);
+    color: var(--text-main);
+    transition: 0.3s;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.site-header {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: var(--primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+
+.btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn--primary {
+    background: var(--primary);
+    color: var(--primary-text);
+}
+
+.pricing-section {
+    padding: 80px 0;
+}
+
+.pricing-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: var(--bg-surface);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    position: relative;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.featured {
+    border: 2px solid var(--primary);
+}
+
+.price {
+    font-size: 28px;
+    margin: 20px 0;
+}
+
+.price span {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.feature-list li {
+    margin-bottom: 10px;
+}
+
+.plan-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--primary);
+    color: var(--primary-text);
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 20px;
+    display: none;
+}
+
+.error-box {
+    text-align: center;
+    color: red;
+    margin-bottom: 20px;
+}

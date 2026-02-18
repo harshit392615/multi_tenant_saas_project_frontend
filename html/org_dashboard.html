@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Organization Dashboard</title>
+    <link rel="stylesheet" href="../css/org_dashboard.css">
+</head>
+<body data-theme="dark">
+
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon">N</div>
+            <span class="brand-name">Nexus</span>
+        </div>
+
+        <nav class="nav-menu">
+            <ul>
+                <li>
+                    <a href="#" class="nav-item" data-route="overview">
+                        <span class="icon">🏠</span>
+                        <span class="label">Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item" data-route="members">
+                        <span class="icon">👥</span>
+                        <span class="label">Members</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item" data-route="workspaces">
+                        <span class="icon">🧩</span>
+                        <span class="label">Workspaces</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item" data-route="logs">
+                        <span class="icon">📜</span>
+                        <span class="label">Logs</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-titles">
+                <span class="breadcrumb">Nexus / Organization</span>
+                <h1>Organization Dashboard</h1>
+            </div>
+
+            <div class="header-actions">
+    <button id="subscription-btn" class="btn btn-primary">
+        💳 Subscription
+    </button>
+    <button id="delete-org-btn" class="btn btn-danger">
+    🗑 Delete Organization
+</button>
+<button id="theme-toggle" class="btn btn-ghost btn-icon">
+    <span class="icon-sun">☀️</span>
+    <span class="icon-moon">🌙</span>
+</button>
+
+
+</div>
+        </header>
+
+        <div class="dashboard-grid">
+
+    <!-- Workspaces -->
+    <section id="overview-section" class="card workspace-section">
+        <div class="card-header">
+            <h2>Workspaces</h2>
+            <button id="create-workspace-btn" class="btn btn-primary">
+                + Create Workspace
+            </button>
+        </div>
+        <ul id="workspace_container"></ul>
+    </section>
+
+    <!-- Members -->
+    <section id="members-section" class="card members-section">
+        <div class="card-header">
+            <h2>Members</h2>
+            <button id="add-member-btn" class="btn btn-primary">
+                + Add Member
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Logs -->
+    <section id="logs-section" class="card logs-section">
+        <div class="card-header">
+            <h2>Activity Logs</h2>
+        </div>
+        <ul id="activity-feed"></ul>
+    </section>
+
+</div>
+
+    </main>
+
+    <!-- Create Workspace Modal (Required for JS) -->
+    <div id="create-workspace-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Workspace</h3>
+            </div>
+            <div class="modal-body">
+                <label for="workspace-name-input">Workspace Name</label>
+                <input type="text" id="workspace-name-input" placeholder="e.g. Engineering Team">
+            </div>
+            <div class="modal-footer">
+                <button id="create-workspace-cancel" class="btn btn-ghost">Cancel</button>
+                <button id="create-workspace-submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+    <!-- Add Member Modal -->
+<div id="add-member-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Member</h3>
+        </div>
+
+        <div class="modal-body">
+            <label>Email</label>
+            <input id="member-email-input" type="email" placeholder="user@example.com">
+
+            <label style="margin-top:1rem;">Role</label>
+            <select id="member-role-input">
+    <option value="viewer">Viewer</option>
+    <option value="member">Member</option>
+    <option value="admin">Admin</option>
+</select>
+
+        </div>
+
+        <div class="modal-footer">
+            <button id="add-member-cancel" class="btn btn-ghost">Cancel</button>
+            <button id="add-member-submit" class="btn btn-primary">
+                Invite
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Script Injection Placeholder -->
+    <script src="../js/org_dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="One tool for your team to organize documents, share notes, and manage tasks.">
+    <title>Nexus | All-in-one workspace</title>
+    <link rel="stylesheet" href="../css/home.css">
+    <!-- Preload fonts if using external, relying on System UI for this demo -->
+</head>
+<body>
+
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header / Navigation -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <!-- Logo -->
+            <a href="#" class="logo" aria-label="Nexus Home">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 6L10 18M6 6H8L10 12L12 6H14V18H12L10 12L8 18H6V6Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Nexus</span>
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="Toggle navigation menu">
+                <span class="hamburger"></span>
+            </button>
+
+            <!-- Navigation & Actions -->
+            <nav id="primary-nav" class="nav-container">
+                <ul class="nav-links">
+                    <li><a href="#">Product</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Solutions</a></li>
+                    <li><a href="#">Pricing</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    <button id="theme-toggle" class="btn btn--icon" aria-label="Toggle dark mode">
+                        <!-- Sun Icon -->
+                        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <!-- Moon Icon (Hidden by default via CSS) -->
+                        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <a href="login.html" class="nav-link-login">Log in</a>
+                    <a href="signup.html" class="btn btn--primary">Get started</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container hero-inner">
+                <h1 class="hero-title">All-in-one workspace</h1>
+                <p class="hero-subtitle">One tool for your team to organize documents, share notes, and manage tasks.</p>
+                <div class="hero-cta-group">
+                    <a href="#workspace-preview" class="btn btn--primary btn--large js-scroll-trigger">Get started</a>
+                    <span class="hero-helper">Free trial. No credit card required.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Workspace Preview Grid -->
+        <section id="workspace-preview" class="workspace-section">
+            <div class="container">
+                <div class="grid-layout">
+                    
+                    <!-- Card 1: Project Table -->
+                    <article class="card card--project">
+                        <header class="card-header">
+                            <h2 class="card-title">Engineering Project</h2>
+                            <button class="icon-btn" aria-label="Options">•••</button>
+                        </header>
+                        <div class="table-responsive">
+                            <table class="data-table" id="project-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button class="sort-btn" aria-controls="project-table" data-col="0">
+                                                Task <span aria-hidden="true" class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="sort-btn" aria-controls="project-table" data-col="1">
+                                                Status <span aria-hidden="true" class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button class="sort-btn" aria-controls="project-table" data-col="2">
+                                                Due <span aria-hidden="true" class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>API Integration</td>
+                                        <td><span class="status-chip status-blue">In progress</span></td>
+                                        <td>Oct 24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>UX Audit</td>
+                                        <td><span class="status-chip status-purple">Review</span></td>
+                                        <td>Oct 26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Database Mig.</td>
+                                        <td><span class="status-chip status-green">Complete</span></td>
+                                        <td>Oct 20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div aria-live="polite" class="sr-only" id="sort-announcer"></div>
+                        </div>
+                    </article>
+
+                    <!-- Card 2: Meeting Notes -->
+                    <article class="card card--notes">
+                        <header class="card-header">
+                            <div class="card-icon-title">
+                                <span class="emoji">📝</span>
+                                <h2 class="card-title">Sprint Planning</h2>
+                            </div>
+                        </header>
+                        <div class="card-body">
+                            <ul class="bullet-list">
+                                <li>Discuss Q2 OKRs and goals</li>
+                                <li>Plan sprints for next phase</li>
+                                <li>Review project backlog items</li>
+                                <li>Assign tickets to engineers</li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <!-- Card 3: Team Wiki -->
+                    <article class="card card--wiki">
+                        <header class="card-header">
+                            <div class="card-icon-title">
+                                <span class="emoji">📚</span>
+                                <h2 class="card-title">Team Wiki</h2>
+                            </div>
+                        </header>
+                        <div class="card-body">
+                            <ul class="link-list">
+                                <li>
+                                    <a href="#" class="wiki-link">
+                                        <span class="emoji">🚀</span> Getting started
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="wiki-link">
+                                        <span class="emoji">⚖️</span> Company policies
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="wiki-link">
+                                        <span class="emoji">💻</span> Engineering
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="wiki-link">
+                                        <span class="emoji">🆘</span> Support
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <!-- Card 4: Task List -->
+                    <article class="card card--tasks">
+                        <header class="card-header">
+                            <h2 class="card-title">Your Tasks</h2>
+                            <div class="avatars">
+                                <!-- CSS-made avatars for simplicity -->
+                                <div class="avatar" style="background-color: #FFD700" title="Alice">A</div>
+                                <div class="avatar" style="background-color: #FF6B6B" title="Bob">B</div>
+                                <div class="avatar avatar--empty">+</div>
+                            </div>
+                        </header>
+                        <div class="card-body">
+                            <form class="task-form">
+                                <div class="task-item">
+                                    <input type="checkbox" id="task1" name="task" class="task-checkbox">
+                                    <label for="task1">Write new documentation</label>
+                                </div>
+                                <div class="task-item">
+                                    <input type="checkbox" id="task2" name="task" class="task-checkbox" checked>
+                                    <label for="task2">Update roadmap</label>
+                                </div>
+                                <div class="task-item">
+                                    <input type="checkbox" id="task3" name="task" class="task-checkbox">
+                                    <label for="task3">Plan team offsite</label>
+                                </div>
+                            </form>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-social">
+                <a href="#" aria-label="Twitter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                </a>
+                <a href="#" aria-label="GitHub">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                </a>
+            </div>
+            <p class="copyright">&copy; 2026 Nexus Inc.</p>
+        </div>
+    </footer>
+
+    <script src="../js/home.js"></script>
+</body>
+</html>

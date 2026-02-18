@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Board</title>
+    <link rel="stylesheet" href="../css/boards.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 1. Boards Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="workspace-icon">N</div>
+            <span>Workspace</span>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="section-title">Boards</div>
+            <ul class="board-list">
+                <!-- Example Boards -->
+                <li class="board-item active" data-slug="product-launch">Product Launch</li>
+                <li class="board-item" data-slug="marketing-q1">Marketing Q1</li>
+                <li class="board-item" data-slug="design-system">Design System</li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- 2. Main Content -->
+    <main class="board-view">
+        <header class="board-header">
+            <div class="board-title-group">
+                <h1 id="board-title">Product Launch</h1>
+                <span class="board-meta">Kanban View</span>
+            </div>
+            <button id="btn-create-card" class="btn btn-primary">New Card</button>
+        </header>
+
+        <!-- Kanban Board Container -->
+        <div class="kanban-container">
+            <!-- Mandatory Column: Backlog -->
+            <div class="kanban-column" data-status="backlog">
+                <div class="column-header">
+                    <span class="column-name">Backlog</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="cards-container" id="col-backlog">
+                    <!-- Cards injected here via JS -->
+                </div>
+            </div>
+
+            <!-- Mandatory Column: Todo -->
+            <div class="kanban-column" data-status="todo">
+                <div class="column-header">
+                    <span class="column-name">To Do</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="cards-container" id="col-todo"></div>
+            </div>
+
+            <!-- Mandatory Column: In Progress -->
+            <div class="kanban-column" data-status="inprogress">
+                <div class="column-header">
+                    <span class="column-name">In Progress</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="cards-container" id="col-inprogress"></div>
+            </div>
+
+            <!-- Mandatory Column: Testing -->
+            <div class="kanban-column" data-status="testing">
+                <div class="column-header">
+                    <span class="column-name">Testing</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="cards-container" id="col-testing"></div>
+            </div>
+
+            <!-- Mandatory Column: Done -->
+            <div class="kanban-column" data-status="done">
+                <div class="column-header">
+                    <span class="column-name">Done</span>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="cards-container" id="col-done"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 3. Modal (Hidden by default) -->
+<div id="card-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-content" role="dialog" aria-modal="true">
+        <header class="modal-header">
+            <div class="modal-breadcrumbs">Product Launch / <span id="modal-status-display">Todo</span></div>
+            <button id="btn-close-modal" class="btn-icon" aria-label="Close">&times;</button>
+        </header>
+        
+        <div class="modal-body">
+            <!-- Hidden ID for logic -->
+            <input type="hidden" id="modal-card-id">
+            
+            <div class="form-group">
+                <input type="text" id="modal-title-input" class="modal-title-input" placeholder="Card Title" />
+            </div>
+            
+            <div class="form-group">
+                <label class="modal-label">Status</label>
+                <select id="modal-status-select" class="modal-select">
+                    <option value="backlog">Backlog</option>
+                    <option value="todo">To Do</option>
+                    <option value="inprogress">In Progress</option>
+                    <option value="testing">Testing</option>
+                    <option value="done">Done</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="modal-label">Description</label>
+                <textarea id="modal-desc-input" class="modal-textarea" placeholder="Add a description..."></textarea>
+            </div>
+        </div>
+
+        <footer class="modal-footer">
+            <button id="btn-delete-card" class="btn btn-danger">Delete</button>
+            <div class="modal-actions-right">
+                <button id="btn-save-card" class="btn btn-primary">Save</button>
+            </div>
+        </footer>
+    </div>
+</div>
+
+    <script src="../js/boards.js"></script>
+
+</body>
+</html>

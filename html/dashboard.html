@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="avatar">U</div>
+                    <span class="username">User Dashboard</span>
+                </div>
+            </div>
+
+            <!-- GLOBAL SEARCH (Preserving class for JS) -->
+            <div class="search-bar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="Search..." aria-label="Search">
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- ORGANIZATIONS LIST -->
+                <div class="nav-section">
+                    <h4 class="nav-title">Organizations</h4>
+                    <!-- JS targets this ID -->
+                    <ul id="orgs-list" class="nav-list"></ul>
+                </div>
+
+                <!-- PROJECTS/WORKSPACES LIST -->
+                <div class="nav-section">
+                    <h4 class="nav-title">Workspaces</h4>
+                    <!-- JS targets this ID -->
+                    <ul id="projects-list" class="nav-list"></ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="dot"></span> System Operational
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="topbar">
+    <div class="topbar-right">
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle dark mode">
+            <!-- Sun -->
+            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+
+            <!-- Moon -->
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+
+        <!-- Keep your notification button here -->
+        <div class="notification-wrapper">
+            ...
+        </div>
+    </div>
+</div>
+
+            <div class="notification-wrapper">
+    <button id="notification-btn" class="notification-btn" type="button">
+    🔔 <span id="notification-count" class="notification-count">0</span>
+</button>
+
+    <div id="notification-dropdown" class="notification-dropdown">
+        <!-- Notifications will be prepended here -->
+    </div>
+</div>
+
+            
+            <!-- SECTION: ORGANIZATIONS -->
+            <section class="content-section">
+                <header class="section-header">
+                    <h2>Organizations</h2>
+                    <p class="section-desc">Manage your team and personal organizations.</p>
+                </header>
+
+                <!-- CREATE ORG INPUTS -->
+                <div class="input-group">
+                    <input type="text" id="orgNameInput" placeholder="New organization name..." class="premium-input">
+                    <button id="submitOrg" class="btn-primary">Create Organization</button>
+                </div>
+
+                <!-- JS targets this ID for Grid -->
+                <div id="orgs-grid" class="card-grid"></div>
+            </section>
+
+            <hr class="divider">
+
+            <!-- SECTION: WORKSPACES -->
+            <section class="content-section">
+                <header class="section-header">
+                    <h2>Workspaces</h2>
+                    <p class="section-desc">Active projects within the current organization.</p>
+                </header>
+
+                <!-- CREATE WORKSPACE INPUTS -->
+                <div class="input-group">
+                    <input type="text" id="workspaceNameInput" placeholder="New workspace name..." class="premium-input">
+                    <button id="submitWorkspace" class="btn-primary">Create Workspace</button>
+                </div>
+
+                <!-- JS targets this ID for Grid -->
+                <div id="projects-grid" class="card-grid"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- JS Logic appended below -->
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

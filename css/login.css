@@ -1,0 +1,238 @@
+/* =====================================================
+   THEME VARIABLES
+===================================================== */
+:root {
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+
+    --border-default: #e5e7eb;
+    --border-focus: #3b82f6;
+    --border-error: #ef4444;
+
+    --bg-button: #111827;
+    --text-button: #ffffff;
+
+    --logo-bg: #111827;
+    --logo-icon: #ffffff;
+
+    --shadow-card: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+/* DARK MODE */
+[data-theme="dark"] {
+    --bg-page: #0f172a;
+    --bg-card: #111827;
+    --text-main: #f9fafb;
+    --text-muted: #9ca3af;
+
+    --border-default: #1f2937;
+    --border-focus: #60a5fa;
+    --border-error: #f87171;
+
+    --bg-button: #ffffff;
+    --text-button: #111827;
+
+    --logo-bg: #ffffff;
+    --logo-icon: #111827;
+
+    --shadow-card: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* =====================================================
+   BASE
+===================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-main);
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 60px 40px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-4px);
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+}
+
+/* Theme Button */
+.theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.theme-toggle:hover {
+    border-color: var(--border-focus);
+}
+
+/* =====================================================
+   FORM
+===================================================== */
+.form-group {
+    margin-bottom: 22px;
+}
+
+label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-default);
+    background: transparent;
+    color: var(--text-main);
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+input.error {
+    border-color: var(--border-error);
+}
+
+/* =====================================================
+   PASSWORD TOGGLE
+===================================================== */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.toggle-btn:hover {
+    color: var(--text-main);
+}
+
+/* =====================================================
+   BUTTON
+===================================================== */
+.btn-primary {
+    width: 100%;
+    padding: 11px;
+    background: var(--bg-button);
+    color: var(--text-button);
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* =====================================================
+   LINKS
+===================================================== */
+.login-footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.link-secondary {
+    color: var(--text-muted);
+}
+
+.link-primary {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* =====================================================
+   ERRORS
+===================================================== */
+.error-msg {
+    font-size: 12px;
+    color: var(--border-error);
+    margin-top: 4px;
+    min-height: 18px;
+}
+
+.global-error {
+    margin-top: 16px;
+    text-align: center;
+    font-weight: 500;
+    color: var(--border-error);
+}
