@@ -1,30 +1,58 @@
+let pendingPayload = null;
+
+function redirectToPayment(payload) {
+    const errorBox = document.getElementById("errorBox");
+
+    if (!payload || !payload.payu_url) {
+        if (errorBox) errorBox.textContent = "Invalid payment session.";
+        return;
+    }
+
+    pendingPayload = payload;
+
+    const modal = document.getElementById("paymentModal");
+    const planText = document.getElementById("selectedPlanText");
+
+    if (planText) {
+        planText.textContent = "You are subscribing to the selected plan.";
+    }
+
+    if (modal) {
+        modal.style.display = "flex";
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const API_URL = "https://multi-tenant-saas-project.onrender.com/api/organization/subscription/";
     const CURRENT_PLAN_URL = "https://multi-tenant-saas-project.onrender.com/api/organization/current-subscription/";
 
+    const errorBox = document.getElementById("errorBox");
+
+    /* =========================
+       THEME TOGGLE
+    ========================== */
+
     const themeToggle = document.getElementById("themeToggle");
-const themeIcon = document.getElementById("themeIcon");
-const html = document.documentElement;
+    const themeIcon = document.getElementById("themeIcon");
+    const html = document.documentElement;
 
-function applyTheme(theme) {
-    html.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
+    function applyTheme(theme) {
+        html.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        if (themeIcon) {
+            themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
+        }
+    }
 
-    // Only ONE icon visible
-    themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
-}
+    const savedTheme = localStorage.getItem("theme") || "light";
+    applyTheme(savedTheme);
 
-const savedTheme = localStorage.getItem("theme") || "light";
-applyTheme(savedTheme);
-
-themeToggle?.addEventListener("click", () => {
-    const newTheme =
-        html.getAttribute("data-theme") === "light" ? "dark" : "light";
-
-    applyTheme(newTheme);
-});
-
+    themeToggle?.addEventListener("click", () => {
+        const newTheme =
+            html.getAttribute("data-theme") === "light" ? "dark" : "light";
+        applyTheme(newTheme);
+    });
 
     /* =========================
        LOAD CURRENT PLAN
@@ -65,14 +93,14 @@ themeToggle?.addEventListener("click", () => {
     loadCurrentPlan();
 
     /* =========================
-       PLAN SELECTION (AUTO REDIRECT)
+       PLAN SELECTION
     ========================== */
 
     document.querySelectorAll(".select-plan").forEach(button => {
 
         button.addEventListener("click", async (e) => {
 
-            errorBox.textContent = "";
+            if (errorBox) errorBox.textContent = "";
 
             const card = e.target.closest(".pricing-card");
             const title = card?.dataset.plan;
@@ -81,12 +109,12 @@ themeToggle?.addEventListener("click", () => {
             const orgSlug = localStorage.getItem("current_org");
 
             if (!token || !orgSlug) {
-                errorBox.textContent = "Authentication required.";
+                if (errorBox) errorBox.textContent = "Authentication required.";
                 return;
             }
 
             if (!title) {
-                errorBox.textContent = "Invalid plan selected.";
+                if (errorBox) errorBox.textContent = "Invalid plan selected.";
                 return;
             }
 
@@ -113,7 +141,7 @@ themeToggle?.addEventListener("click", () => {
                 redirectToPayment(payload);
 
             } catch (error) {
-                errorBox.textContent = error.message;
+                if (errorBox) errorBox.textContent = error.message;
                 button.disabled = false;
                 button.textContent = "Select Plan";
             }
@@ -121,70 +149,38 @@ themeToggle?.addEventListener("click", () => {
     });
 
     /* =========================
-       PAYU REDIRECT
+       MODAL ACTIONS
     ========================== */
 
-    let pendingPayload = null;
-
-function redirectToPayment(payload) {
-
-    if (!payload || !payload.payu_url) {
-        errorBox.textContent = "Invalid payment session.";
-        return;
-    }
-
-    pendingPayload = payload;
-
+    const confirmBtn = document.getElementById("confirmPaymentBtn");
+    const cancelBtn = document.getElementById("cancelPaymentBtn");
     const modal = document.getElementById("paymentModal");
-    const planText = document.getElementById("selectedPlanText");
 
-    planText.textContent = "You are subscribing to the selected plan.";
-    modal.style.display = "flex";
-}
+    confirmBtn?.addEventListener("click", () => {
 
-});
+        if (!pendingPayload) return;
 
-const confirmBtn = document.getElementById("confirmPaymentBtn");
-const cancelBtn = document.getElementById("cancelPaymentBtn");
-const modal = document.getElementById("paymentModal");
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = pendingPayload.payu_url;
 
-confirmBtn?.addEventListener("click", () => {
+        Object.keys(pendingPayload).forEach(key => {
+            if (key === "payu_url") return;
 
-    if (!pendingPayload) return;
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = pendingPayload[key];
+            form.appendChild(input);
+        });
 
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = pendingPayload.payu_url;
-
-    Object.keys(pendingPayload).forEach(key => {
-        if (key === "payu_url") return;
-
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = pendingPayload[key];
-        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
     });
 
-    document.body.appendChild(form);
-    form.submit();
+    cancelBtn?.addEventListener("click", () => {
+        if (modal) modal.style.display = "none";
+        pendingPayload = null;
+    });
+
 });
-
-cancelBtn?.addEventListener("click", () => {
-    modal.style.display = "none";
-    pendingPayload = null;
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
