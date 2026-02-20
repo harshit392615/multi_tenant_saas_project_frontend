@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Failed | Nexus</title>
+<style>
+/* SAME THEME VARIABLES */
+:root {
+    --bg-body: #ffffff;
+    --bg-surface: #ffffff;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --border-color: #e0e0e0;
+    --primary: #111111;
+    --primary-text: #ffffff;
+    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --radius-lg: 12px;
+}
+
+[data-theme="dark"] {
+    --bg-body: #191919;
+    --bg-surface: #202020;
+    --text-main: #eeeeee;
+    --text-muted: #aaaaaa;
+    --border-color: #333333;
+    --primary: #ffffff;
+    --primary-text: #000000;
+    --shadow-card: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: var(--bg-body);
+    color: var(--text-main);
+    transition: 0.3s;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.site-header {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: var(--primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.card {
+    background: var(--bg-surface);
+    padding: 40px;
+    margin-top: 80px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: var(--primary);
+    color: var(--primary-text);
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <div class="logo">
+            <div class="logo-icon">N</div>
+            <span>Nexus</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="error-icon">❌</div>
+        <h2>Payment Not Verified</h2>
+        <p>Your transaction was not completed or was declined.</p>
+        <p>Redirecting to dashboard in <span id="countdown">5</span> seconds...</p>
+        <button class="btn" onclick="goNow()">Go to Dashboard</button>
+    </div>
+</div>
+
+<script>
+const DASHBOARD_URL = "../html/org_dashboard.html";
+
+let seconds = 5;
+const countdown = document.getElementById("countdown");
+
+const interval = setInterval(() => {
+    seconds--;
+    countdown.textContent = seconds;
+    if (seconds <= 0) {
+        clearInterval(interval);
+        window.location.href = DASHBOARD_URL;
+    }
+}, 1000);
+
+function goNow() {
+    window.location.href = DASHBOARD_URL;
+}
+</script>
+
+</body>
+</html>
