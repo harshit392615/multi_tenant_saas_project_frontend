@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const API_URL = "http://127.0.0.1:8000/api/organization/subscription/";
-    const CURRENT_PLAN_URL = "http://127.0.0.1:8000/api/organization/current-subscription/";
+    const API_URL = "https://multi-tenant-saas-project.onrender.com/api/organization/subscription/";
+    const CURRENT_PLAN_URL = "https://multi-tenant-saas-project.onrender.com/api/organization/current-subscription/";
 
     const themeToggle = document.getElementById("themeToggle");
 const themeIcon = document.getElementById("themeIcon");

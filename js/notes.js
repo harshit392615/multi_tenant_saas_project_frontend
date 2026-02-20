@@ -1,5 +1,5 @@
-const API_BASE = "http://127.0.0.1:8000/api";
-const WS_BASE = "ws://127.0.0.1:8000/ws/notes/";
+const API_BASE = "https://multi-tenant-saas-project.onrender.com/api";
+const WS_BASE = "ws://multi-tenant-saas-project.onrender.com/ws/notes/";
 
 const workspaceSlug = localStorage.getItem("current_workspace");
 const orgSlug = localStorage.getItem("current_org");

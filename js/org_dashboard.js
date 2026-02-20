@@ -2,7 +2,7 @@ console.log("ORG DASHBOARD JS LOADED");
 console.log(localStorage.getItem("current_org_id"))
 // ==================== CONFIG ====================
 const CONFIG = {
-    API_BASE: "http://127.0.0.1:8000/api",
+    API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
     ENDPOINTS: {
     WORKSPACES: "/workspace/",
     MEMBERS: "/organization/membership/",
