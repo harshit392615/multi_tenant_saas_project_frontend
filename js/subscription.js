@@ -124,30 +124,67 @@ themeToggle?.addEventListener("click", () => {
        PAYU REDIRECT
     ========================== */
 
-    function redirectToPayment(payload) {
+    let pendingPayload = null;
 
-        if (!payload || !payload.payu_url) {
-            errorBox.textContent = "Invalid payment session.";
-            return;
-        }
+function redirectToPayment(payload) {
 
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = payload.payu_url;
-
-        Object.keys(payload).forEach(key => {
-
-            if (key === "payu_url") return;
-
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = key;
-            input.value = payload[key];
-            form.appendChild(input);
-        });
-
-        document.body.appendChild(form);
-        form.submit();   // 🚀 Automatic redirect (no second click)
+    if (!payload || !payload.payu_url) {
+        errorBox.textContent = "Invalid payment session.";
+        return;
     }
 
+    pendingPayload = payload;
+
+    const modal = document.getElementById("paymentModal");
+    const planText = document.getElementById("selectedPlanText");
+
+    planText.textContent = "You are subscribing to the selected plan.";
+    modal.style.display = "flex";
+}
+
 });
+
+const confirmBtn = document.getElementById("confirmPaymentBtn");
+const cancelBtn = document.getElementById("cancelPaymentBtn");
+const modal = document.getElementById("paymentModal");
+
+confirmBtn?.addEventListener("click", () => {
+
+    if (!pendingPayload) return;
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = pendingPayload.payu_url;
+
+    Object.keys(pendingPayload).forEach(key => {
+        if (key === "payu_url") return;
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = pendingPayload[key];
+        form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+});
+
+cancelBtn?.addEventListener("click", () => {
+    modal.style.display = "none";
+    pendingPayload = null;
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+

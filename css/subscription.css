@@ -152,3 +152,29 @@ body {
     color: red;
     margin-bottom: 20px;
 }
+.payment-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-card {
+    background: var(--bg-surface);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.payment-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}

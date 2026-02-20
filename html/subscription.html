@@ -97,6 +97,22 @@
   <p>Your transaction is protected by SSL encryption.</p>
 </div>
 
+<!-- PAYMENT CONFIRMATION MODAL -->
+<div id="paymentModal" class="payment-modal">
+  <div class="payment-card">
+      <h3>Confirm Your Subscription</h3>
+      <p id="selectedPlanText"></p>
+      <p>Secure payment powered by PayU.</p>
+      <div class="payment-actions">
+          <button class="btn btn--primary" id="confirmPaymentBtn">
+              Proceed to Secure Payment
+          </button>
+          <button class="btn" id="cancelPaymentBtn">
+              Cancel
+          </button>
+      </div>
+  </div>
+</div>
 <script src="../js/subscription.js"></script>
 </body>
 </html>
