@@ -85,7 +85,8 @@ function renderBoards(boards) {
 
     boards.forEach(board => {
         const li = document.createElement("li");
-        li.dataset.slug = board.slug
+        li.dataset.slug = board.slug;
+        li.dataset.id = board.id;
         li.textContent = board.name;
         
         list.appendChild(li);
@@ -225,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!li) return;
 
     localStorage.setItem("current_board", li.dataset.slug);
+    localStorage.setItem("current_board_id", li.dataset.id);
     window.location.href = "../html/boards.html";
 });
 

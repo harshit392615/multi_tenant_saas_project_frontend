@@ -2,9 +2,12 @@
 const API_BASE = "https://multi-tenant-saas-project.onrender.com/api";
 
 // ==================== STATE ====================
-const workspaceSlug = localStorage.getItem("current_workspace");
-const orgSlug = localStorage.getItem("current_org");
+let workspaceSlug = localStorage.getItem("current_workspace");
+let orgSlug = localStorage.getItem("current_org");
 let boardSlug = localStorage.getItem("current_board");
+let boardId = localStorage.getItem("current_board_id");
+let currentCardSlug = null;
+let currentCardId = null;
 
 let cardsData = [];
 
@@ -22,60 +25,66 @@ function getHeaders() {
     };
 }
 
-async function fetchJSON(url) {
-    const res = await fetch(url, { headers: getHeaders() });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-}
-
-async function postJSON(url, body) {
-    const res = await fetch(url, {
-        method: "POST",
+async function request(url, method = "GET", body = null) {
+    const options = {
+        method,
         headers: {
-            "Content-Type": "application/json",
             ...getHeaders()
-        },
-        body: JSON.stringify(body)
-    });
+        }
+    };
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-}
-async function putJSON(url, body) {
-    const res = await fetch(url, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            ...getHeaders()
-        },
-        body: JSON.stringify(body)
-    });
+    if (body) {
+        options.headers["Content-Type"] = "application/json";
+        options.body = JSON.stringify(body);
+    }
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    const res = await fetch(url, options);
+
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    return res.status !== 204 ? res.json() : null;
 }
 
+// ==================== API ====================
 
-// ==================== FETCH ====================
 function fetchCards() {
-    return fetchJSON(`${API_BASE}/card/boards/${boardSlug}/cards/`);
+    return request(`${API_BASE}/card/boards/${boardSlug}/cards/`);
 }
 
 function createCard(payload) {
-    return postJSON(
+    return request(
         `${API_BASE}/card/boards/${boardSlug}/cards/`,
-        payload
-    );
-}
-function updateCard(cardSlug, payload) {
-    return putJSON(
-        `${API_BASE}/card/boards/${cardSlug}/update/`,
+        "POST",
         payload
     );
 }
 
+function updateCard(cardSlug, payload) {
+    return request(
+        `${API_BASE}/card/boards/${cardSlug}/update/`,
+        "PUT",
+        payload
+    );
+}
+
+function deleteCard(cardid) {
+    return request(
+        `${API_BASE}/card/boards/${cardid}/delete/`,
+        "DELETE"
+    );
+}
+function deleteBoard(boardId) {
+    console.log(boardId)   // ✅ added
+    return request(
+        `${API_BASE}/board/delete/${boardId}/`,
+        "DELETE"
+    );
+}
 
 // ==================== RENDER ====================
+
 function clearBoard() {
     ["backlog", "todo", "inprogress", "testing", "done"].forEach(status => {
         document.getElementById(`col-${status}`).innerHTML = "";
@@ -105,7 +114,7 @@ function renderBoard() {
 function createCardElement(card) {
     const el = document.createElement("div");
     el.className = "card";
-    el.dataset.slug = card.slug;   // ✅ store slug
+    el.dataset.slug = card.slug;
 
     el.innerHTML = `
         <div class="card-title">${card.title || "Untitled"}</div>
@@ -115,7 +124,6 @@ function createCardElement(card) {
     el.addEventListener("click", () => openModal(card));
     return el;
 }
-
 
 function updateCounts() {
     ["backlog", "todo", "inprogress", "testing", "done"].forEach(status => {
@@ -127,12 +135,13 @@ function updateCounts() {
 }
 
 // ==================== MODAL ====================
+
 const modalOverlay = document.getElementById("card-modal-overlay");
 const modalTitle = document.getElementById("modal-title-input");
 const modalDesc = document.getElementById("modal-desc-input");
 const modalStatus = document.getElementById("modal-status-select");
 const modalStatusDisplay = document.getElementById("modal-status-display");
-const modalId = document.getElementById("modal-card-id");
+const modalslug = document.getElementById("modal-card-id");
 const btnSave = document.getElementById("btn-save-card");
 const btnDelete = document.getElementById("btn-delete-card");
 const btnClose = document.getElementById("btn-close-modal");
@@ -141,30 +150,36 @@ function openModal(card = null) {
     modalOverlay.classList.remove("hidden");
 
     if (card) {
-        modalId.value = card.slug;  // ✅ store slug
+        currentCardSlug = card.slug;
+        currentCardId = card.id;
+
         modalTitle.value = card.title;
         modalDesc.value = card.description || "";
         modalStatus.value = card.status;
         modalStatusDisplay.textContent = card.status;
+
         btnDelete.style.display = "inline-block";
         btnSave.textContent = "Save Changes";
     } else {
-        modalId.value = "";
+        currentCardSlug = null;
+        currentCardId = null;
+
         modalTitle.value = "";
         modalDesc.value = "";
         modalStatus.value = "backlog";
         modalStatusDisplay.textContent = "New Card";
+
         btnDelete.style.display = "none";
         btnSave.textContent = "Create Card";
     }
 }
-
 
 function closeModal() {
     modalOverlay.classList.add("hidden");
 }
 
 // ==================== ACTIONS ====================
+
 btnSave.addEventListener("click", async () => {
     const title = modalTitle.value.trim();
     if (!title) return;
@@ -173,59 +188,62 @@ btnSave.addEventListener("click", async () => {
         title,
         description: modalDesc.value,
         status: modalStatus.value,
-        due_date: null   // or wire from input if present
+        due_date: null
     };
 
-    const cardSlug = modalId.value;
+    const cardSlug = currentCardSlug;
 
-    // ================= UPDATE =================
     if (cardSlug) {
         await updateCard(cardSlug, payload);
-        await loadBoard();
-        closeModal();
-        return;
+    } else {
+        await createCard(payload);
     }
 
-    // ================= CREATE =================
-    await createCard(payload);
     await loadBoard();
     closeModal();
 });
 
+btnDelete.addEventListener("click", async () => {
+    const cardid = currentCardId;
+    if (!cardid) return;
 
-btnDelete.addEventListener("click", () => {
-    const id = modalId.value;
-    if (!id) return;
+    if (!confirm("Delete this card permanently?")) return;
 
-    if (confirm("Delete this card?")) {
-        cardsData = cardsData.filter(c => c.id != id);
-        renderBoard();
-        closeModal();
-    }
+    await deleteCard(cardid);
+    await loadBoard();
+    closeModal();
 });
 
 btnClose.addEventListener("click", closeModal);
+
 modalOverlay.addEventListener("click", e => {
     if (e.target === modalOverlay) closeModal();
 });
 
 // ==================== SIDEBAR ====================
+
 document.querySelectorAll(".board-item").forEach(item => {
     item.addEventListener("click", async () => {
+
         document.querySelectorAll(".board-item")
             .forEach(i => i.classList.remove("active"));
 
         item.classList.add("active");
 
         boardSlug = item.dataset.slug;
+        boardId = item.dataset.id;   // ✅ save numeric id
+
         localStorage.setItem("current_board", boardSlug);
-        document.getElementById("board-title").textContent = item.textContent;
+        localStorage.setItem("current_board_id", boardId);
+
+        document.getElementById("board-title").textContent =
+            item.textContent;
 
         await loadBoard();
     });
 });
-
 // ==================== INIT ====================
+
 async function loadBoard() {
     cardsData = await fetchCards();
     renderBoard();
@@ -234,4 +252,73 @@ async function loadBoard() {
 document.getElementById("btn-create-card")
     .addEventListener("click", () => openModal());
 
-document.addEventListener("DOMContentLoaded", loadBoard);
+// ==================== THEME ====================
+
+const toggleBtn = document.getElementById("theme-toggle");
+const body = document.body;
+const icon = toggleBtn.querySelector(".theme-icon");
+
+// Load saved theme
+const savedTheme = localStorage.getItem("theme");
+
+if (savedTheme === "light") {
+    body.classList.add("light");
+    icon.textContent = "☀️";
+} else {
+    body.classList.remove("light");
+    icon.textContent = "🌙";
+}
+
+// Toggle on click
+toggleBtn.addEventListener("click", () => {
+    body.classList.toggle("light");
+
+    const isLight = body.classList.contains("light");
+
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    icon.textContent = isLight ? "☀️" : "🌙";
+});
+// ==================== DELETE BOARD ====================
+
+const btnDeleteBoard = document.getElementById("btn-delete-board");
+
+if (btnDeleteBoard) {
+    btnDeleteBoard.addEventListener("click", async () => {
+
+        if (!boardId) {
+            alert("No board selected.");
+            return;
+        }
+
+        if (!confirm("Delete this board permanently?")) return;
+
+        try {
+            await deleteBoard(boardId);
+
+            // Remove active board from sidebar
+            const activeItem = document.querySelector(".board-item.active");
+            if (activeItem) activeItem.remove();
+
+            // Clear UI
+            clearBoard();
+            document.getElementById("board-title").textContent = "Board Deleted";
+
+            // Clear state
+            boardSlug = null;
+            boardId = null;
+
+            localStorage.removeItem("current_board");
+            localStorage.removeItem("current_board_id");
+
+            window.location.href = "../html/workspace.html";
+        } catch (error) {
+            console.error(error);
+            alert("Failed to delete board.");
+        }
+    });
+}
+document.addEventListener("DOMContentLoaded", async () => {
+    if (boardSlug) {
+        await loadBoard();
+    }
+});

@@ -30,12 +30,28 @@
     <!-- 2. Main Content -->
     <main class="board-view">
         <header class="board-header">
-            <div class="board-title-group">
-                <h1 id="board-title">Product Launch</h1>
-                <span class="board-meta">Kanban View</span>
-            </div>
-            <button id="btn-create-card" class="btn btn-primary">New Card</button>
-        </header>
+    <div class="board-title-group">
+        <h1 id="board-title">Product Launch</h1>
+        <span class="board-meta">Kanban View</span>
+    </div>
+
+    <div class="board-header-actions">
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+            <span class="theme-icon">🌙</span>
+        </button>
+
+        <!-- Delete Board Button -->
+        <button id="btn-delete-board" class="btn btn-danger">
+            Delete Board
+        </button>
+
+        <!-- Create Card Button -->
+        <button id="btn-create-card" class="btn btn-primary">
+            New Card
+        </button>
+    </div>
+</header>
 
         <!-- Kanban Board Container -->
         <div class="kanban-container">
