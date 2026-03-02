@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('https://multi-tenant-saas-project.onrender.com/api/auth/login/', {
+            const response = await fetch('https://multi-tenant-saas-project.onrender.comsaas-project.onrender.comsaas-project.onrender.com/api/auth/login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // IMPORTANT: Adjust this URL to match your backend's actual password reset endpoint
-                const response = await fetch('https://multi-tenant-saas-project.onrender.com/api/auth/forgot-password/', {
+                const response = await fetch('https://multi-tenant-saas-project.onrender.comsaas-project.onrender.comsaas-project.onrender.comsaas-project.onrender.com/api/auth/forgot-password/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })

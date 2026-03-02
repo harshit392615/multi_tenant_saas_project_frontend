@@ -1,6 +1,6 @@
 // ==================== CONFIG & STATE ====================
 const CONFIG = {
-    API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
+    API_BASE: "https://multi-tenant-saas-project.onrender.comsaas-project.onrender.com/api",
     // Adjust WS_BASE to wss:// for production
     WS_BASE: "wss://multi-tenant-saas-project.onrender.com/ws/notes/" 
 };
@@ -424,7 +424,7 @@ function initHeartbeat() {
     if (!token) return;
 
     // Adjust the URL to exactly match your backend's activity routing
-    const heartbeatEndpoint = `${CONFIG.API_BASE}/activity/status/?token=${token}`;
+    const heartbeatEndpoint = `${CONFIG.API_BASE}/auth/activity/status/?token=${token}`;
 
     if (heartbeatConnection) heartbeatConnection.close();
     

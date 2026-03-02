@@ -1,6 +1,6 @@
 // ==================== CONFIG & STATE ====================
 const CONFIG = {
-    API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
+    API_BASE: "https://multi-tenant-saas-project.onrender.comsaas-project.onrender.com/api",
     ENDPOINTS: {
         ORG_LIST: "/organization/list/",
         ORG_CREATE: "/organization/create/",
@@ -1176,6 +1176,34 @@ function initTopbarAndSSE() {
     document.getElementById('btn-logout')?.addEventListener('click', () => {
         if(confirm("Are you sure you want to log out?")) {
             forceLogout();
+        }
+    });
+
+    document.getElementById('mark-all-read')?.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Prevents the dropdown from closing when clicked
+        
+        // 1. Visually mark all items as read immediately (optimistic UI update)
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        if (unreadItems.length === 0) return; // Nothing to do
+        
+        unreadItems.forEach(item => {
+            item.classList.remove('unread');
+        });
+
+        // 2. Hide the red badge
+        const badge = document.getElementById('notification-count');
+        if (badge) {
+            badge.textContent = "0";
+            badge.style.display = 'none';
+        }
+
+        // 3. Send POST request to the backend
+        try {
+            // Because we fixed postJSON earlier, it automatically adds the Token and Org Slug headers!
+            // Passing a dummy payload `{ action: "mark_all_read" }` (or just `{}`)
+            await postJSON(`${CONFIG.API_BASE}/notification/update/`, { action: "mark_all_read" });
+        } catch (err) {
+            console.error("Failed to sync 'mark all read' with server:", err);
         }
     });
 
