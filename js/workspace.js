@@ -483,8 +483,7 @@ function initModals() {
 document.addEventListener("DOMContentLoaded", async () => {
     const isValidSession = await refreshAccessToken();
     if (!isValidSession) return;
-    loadWorkspaceData();
-
+    
     initRouter();
     initModals();
     initSearch();
@@ -492,6 +491,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     setInterval(refreshAccessToken, 8 * 60 * 1000);
     
+    loadWorkspaceData();
 });
 
 // ==================== USER PRESENCE / HEARTBEAT SSE ====================

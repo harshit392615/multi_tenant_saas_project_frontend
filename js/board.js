@@ -175,22 +175,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         forceLogout();
         return;}
 
-    loadSidebarBoards();
-
-    if (!state.workspaceSlug) {
-        alert("Workspace context lost. Redirecting to dashboard.");
+        
+        if (!state.workspaceSlug) {
+            alert("Workspace context lost. Redirecting to dashboard.");
         window.location.href = "dashboard.html";
         return;
     }
-
+    
     document.getElementById('mobileMenuToggle')?.addEventListener('click', () => {
         document.getElementById('sidebar')?.classList.toggle('open');
     });
-
+    
     initModals();
     initHeartbeat();
     setInterval(refreshAccessToken, 8 * 60 * 1000);
     
+    loadSidebarBoards();
 });
 // ==================== DATA LOADING ====================
 
@@ -492,7 +492,7 @@ function initHeartbeat() {
     if (!token) return;
 
     // Adjust the URL to exactly match your backend's activity routing
-    const heartbeatEndpoint = `${CONFIG.API_BASE}/activity/status/?token=${token}`;
+    const heartbeatEndpoint = `${CONFIG.API_BASE}/auth/activity/status/?token=${token}`;
 
     if (heartbeatConnection) heartbeatConnection.close();
     

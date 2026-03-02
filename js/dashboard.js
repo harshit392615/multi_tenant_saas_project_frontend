@@ -1122,23 +1122,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         forceLogout();
         return;}
      // Stop execution if session is invalid (forceLogout takes over)
-    loadData();
-
-    // 2. Initialize UI Components
-    initRouter();
-    initOrgSwitcher();
-    initCreationModals();
-    initSearchAndFilters();
-    initSettingsInteractions();
-    initMiscInteractions();
-    initBillingInteractions();
-    initTopbarAndSSE();
-    initHeartbeat();
-    
-    // 3. Set background auto-refresh interval (every 8 minutes)
-    setInterval(refreshAccessToken, 8 * 60 * 1000);
-
-    // 4. Finally, fetch the real dashboard data securely
+     
+     // 2. Initialize UI Components
+     initRouter();
+     initOrgSwitcher();
+     initCreationModals();
+     initSearchAndFilters();
+     initSettingsInteractions();
+     initMiscInteractions();
+     initBillingInteractions();
+     initTopbarAndSSE();
+     initHeartbeat();
+     
+     // 3. Set background auto-refresh interval (every 8 minutes)
+     setInterval(refreshAccessToken, 8 * 60 * 1000);
+     
+     // 4. Finally, fetch the real dashboard data securely
+     loadData();
 });
 // ==================== TOPBAR UI & SSE NOTIFICATIONS ====================
 
