@@ -1,82 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Create your Nexus account to start collaborating.">
     <title>Sign up - Nexus</title>
-
-    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/signup.css">
 </head>
 <body>
 
 <main class="auth-container">
     <div class="auth-card">
-
-        <!-- Header -->
         <header class="auth-header">
-            <div class="logo">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                    <rect width="24" height="24" rx="6" fill="var(--logo-bg)"/>
-<path d="M7 6V18H9.5L14.5 10V18H17V6H14.5L9.5 14V6H7Z"
-      fill="var(--logo-icon)"/>
-
-                </svg>
-            </div>
-
-            <button id="theme-toggle" class="btn btn--icon" aria-label="Toggle theme">
-                <span class="toggle-icon">🌙</span>
-            </button>
-
-            <h1>Create your account</h1>
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 6L10 18M6 6H8L10 12L12 6H14V18H12L10 12L8 18H6V6Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Nexus</span>
+            </a>
+            <h1 id="headerTitle">Create your account</h1>
         </header>
 
-        <!-- Form -->
-        <form id="signupForm" class="auth-form" novalidate>
-
-            <div class="form-group">
-                <label for="username">Full Name</label>
-                <input type="text" id="username" placeholder="Jane Doe" required>
-                <span class="error-msg" id="usernameError"></span>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="jane@example.com" required>
-                <span class="error-msg" id="emailError"></span>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="password" placeholder="Minimum 8 characters" required>
-                    <button type="button" class="toggle-password" data-target="password">👁</button>
+        <div id="signupFormContainer">
+            <form id="signupForm" class="auth-form" novalidate>
+                <div class="form-group">
+                    <label for="username">Full Name</label>
+                    <input type="text" id="username" name="username" placeholder="Jane Doe" required>
+                    <span class="error-msg" id="usernameError" aria-live="polite"></span>
                 </div>
-                <span class="error-msg" id="passwordError"></span>
-            </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
-                    <button type="button" class="toggle-password" data-target="confirmPassword">👁</button>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+                    <span class="error-msg" id="emailError" aria-live="polite"></span>
                 </div>
-                <span class="error-msg" id="confirmPasswordError"></span>
-            </div>
 
-            <button type="submit" class="btn btn--primary full-width">
-                Sign up
-            </button>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+                        <button type="button" class="toggle-password" data-target="password" aria-label="Show password">👁</button>
+                    </div>
+                    <span class="error-msg" id="passwordError" aria-live="polite"></span>
+                </div>
 
-            <div id="formStatus" class="form-status" role="alert"></div>
-        </form>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
+                        <button type="button" class="toggle-password" data-target="confirmPassword" aria-label="Show password">👁</button>
+                    </div>
+                    <span class="error-msg" id="confirmPasswordError" aria-live="polite"></span>
+                </div>
 
-        <footer class="auth-footer">
-            <p>Already have an account?
-                <a href="login.html" class="link-primary">Log in</a>
-            </p>
-        </footer>
+                <button type="submit" class="btn btn--primary full-width">Sign up</button>
+
+                <div id="formStatus" class="form-status" role="alert"></div>
+            </form>
+
+            <footer class="auth-footer">
+                <p>Already have an account? <a href="login.html" class="link-primary">Log in</a></p>
+            </footer>
+        </div>
+
+        <div id="successScreen" class="success-screen" style="display: none;">
+            <div class="success-icon">✉️</div>
+            <h2>Check your email</h2>
+            <p>We've sent a verification link to <br><strong id="userEmailDisplay"></strong>.</p>
+            <p class="success-helper">Please verify your email address to activate your account and log in.</p>
+            <a href="login.html" class="btn btn--primary full-width">Go to Login</a>
+        </div>
 
     </div>
 </main>

@@ -467,3 +467,53 @@ a { text-decoration: none; color: inherit; }
 .btn-danger:hover {
     background: #C7363B;
 }
+/* ================= MOBILE SIDEBAR SUPPORT ================= */
+
+/* Hide toggle on desktop */
+#menuToggle {
+    display: none;
+}
+
+/* Mobile behavior */
+@media (max-width: 768px) {
+
+    /* Show toggle */
+    #menuToggle {
+        display: flex;
+    }
+
+    /* Sidebar becomes sliding drawer */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    /* Prevent background scroll when sidebar open */
+    body.sidebar-open {
+        overflow: hidden;
+    }
+
+    /* Layout stacking */
+    body {
+        overflow-y: auto;
+    }
+
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .main-content {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}

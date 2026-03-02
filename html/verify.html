@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Verify your Nexus account email.">
+    <title>Verify Email - Nexus</title>
+    <link rel="stylesheet" href="../css/signup.css">
+</head>
+<body>
+
+<main class="auth-container">
+    <div class="auth-card" style="text-align: center;">
+        
+        <header class="auth-header" style="margin-bottom: 24px;">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 6L10 18M6 6H8L10 12L12 6H14V18H12L10 12L8 18H6V6Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Nexus</span>
+            </a>
+            <h1>Email Verification</h1>
+        </header>
+
+        <div id="verifyPending">
+            <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">
+                Click the button below to verify your email address and activate your account.
+            </p>
+            <button id="verifyBtn" class="btn btn--primary full-width">Verify My Email</button>
+            <div id="verifyError" class="form-status error" style="margin-top: 16px;"></div>
+        </div>
+
+        <div id="verifySuccess" class="success-screen" style="display: none;">
+            <div class="success-icon" style="font-size: 3rem; margin-bottom: 16px;">✅</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Verification Successful!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">
+                Your email has been verified and your account is now active.
+            </p>
+            <a href="login.html" class="btn btn--primary full-width">Go to Login</a>
+        </div>
+
+    </div>
+</main>
+
+<script src="../js/verify.js"></script>
+</body>
+</html>

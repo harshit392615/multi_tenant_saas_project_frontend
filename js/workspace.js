@@ -1,270 +1,504 @@
-// ---------------- CONFIG ----------------
-const API_BASE = "https://multi-tenant-saas-project.onrender.com/api";
+// ==================== CONFIG & STATE ====================
+const CONFIG = {
+    API_BASE: "http://127.0.0.1:8000/api",
+    COLORS: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899']
+};
 
-// ---------------- STATE ----------------
-const workspaceSlug = localStorage.getItem("current_workspace");
-const orgSlug = localStorage.getItem("current_org");
+const urlParams = new URLSearchParams(window.location.search);
+const state = {
+    activeOrgSlug: localStorage.getItem("active_org"),
+    workspaceSlug: urlParams.get('ws') || localStorage.getItem("current_workspace"),
+    workspaceDetails: { name: "", description: "" },
+    boards: [],
+    tasks: [],
+    notes: []
+};
 
-// ---------------- HELPERS ----------------
-function getHeaders() {
+// Ensure we fallback properly if URL param is missing
+if (urlParams.get('ws')) {
+    localStorage.setItem("current_workspace", urlParams.get('ws'));
+}
+
+// ==================== API HELPERS ====================
+// ==================== API HELPERS & 401 INTERCEPTOR ====================
+function authHeaders(extra = {}) {
     const token = localStorage.getItem("access");
-
-    if (!token || !orgSlug) {
-        throw new Error("Missing auth or org context");
-    }
-
-    return {
-        "Authorization": `Bearer ${token}`,
-        "X-ORG-SLUG": orgSlug
-    };
+    return token ? { Authorization: `Bearer ${token}`, ...extra } : extra;
 }
 
-async function fetchJSON(url) {
-    const response = await fetch(url, {
-        headers: getHeaders()
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+// Global interceptor: If ANY request returns 401, instantly log the user out
+function check401(res) {
+    if (res.status === 401) {
+        forceLogout();
+        throw new Error("Unauthorized - Session expired.");
     }
-
-    return response.json();
 }
 
-async function postJSON(url, body) {
-    const response = await fetch(url, {
+async function fetchJSON(url, headers = {}) {
+    const res = await fetch(url, { headers });
+    check401(res);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+async function postJSON(url, body, headers = {}) {
+    const res = await fetch(url, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            ...getHeaders()
-        },
+        headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify(body)
     });
-
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-    }
-
-    return response.json();
+    check401(res);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
 }
 
-
-// ---------------- FETCH FUNCTIONS ----------------
-function fetchBoards() {
-    return fetchJSON(`${API_BASE}/board/workspaces/${workspaceSlug}/boards/`);
-}
-
-function fetchNotes() {
-    return fetchJSON(`${API_BASE}/notes/workspaces/${workspaceSlug}/notes/`);
-}
-
-function createBoard(name) {
-    return postJSON(
-        `${API_BASE}/board/workspaces/${workspaceSlug}/boards/`,
-        { name }
-    );
-}
-
-function createNote(title, content) {
-    return postJSON(
-        `${API_BASE}/notes/workspaces/${workspaceSlug}/notes/`,
-        { title, content }
-    );
-}
-
-
-// ---------------- RENDER FUNCTIONS ----------------
-function renderBoards(boards) {
-    const list = document.getElementById("boards-list");
-    list.innerHTML = "";
-
-    if (!boards.length) {
-        list.innerHTML = "<li>No boards found</li>";
-        return;
-    }
-
-    boards.forEach(board => {
-        const li = document.createElement("li");
-        li.dataset.slug = board.slug;
-        li.dataset.id = board.id;
-        li.textContent = board.name;
-        
-        list.appendChild(li);
+async function patchJSON(url, body, headers = {}) {
+    const res = await fetch(url, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body)
     });
+    check401(res);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
 }
 
-function renderNotes(notes) {
-    const list = document.getElementById("notes-list");
-    list.innerHTML = "";
-
-    if (!notes.length) {
-        list.innerHTML = "<li>No notes found</li>";
-        return;
-    }
-
-    notes.forEach(note => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${note.title}</strong><br>
-            ${note.content}
-        `;
-        li.dataset.slug = note.slug
-        list.appendChild(li);
+async function putJSON(url, body, headers = {}) {
+    const res = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body)
     });
+    check401(res);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
 }
 
-// ---------------- INIT ----------------
-async function initWorkspaceDashboard() {
-    if (!workspaceSlug) {
-        alert("No workspace selected");
-        return;
+async function deleteJSON(url, headers = {}, body = null) {
+    const options = {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", ...headers }
+    };
+    if (body) options.body = JSON.stringify(body);
+
+    const res = await fetch(url, options);
+    check401(res);
+    if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
+    if (res.status === 204) return {}; 
+    return res.json();
+}
+
+// ==================== SESSION MANAGEMENT ====================
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem("refresh");
+    
+    if (!refreshToken) {
+        console.warn("No refresh token found.");
+        forceLogout();
+        return false;
     }
 
     try {
-        const [boards, notes] = await Promise.all([
-            fetchBoards(),
-            fetchNotes()
+        const response = await fetch(`${CONFIG.API_BASE}/auth/refresh/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        // If the refresh token itself is expired or invalid
+        if (!response.ok) {
+            throw new Error("Invalid refresh token.");
+        }
+
+        const data = await response.json();
+        
+        // Save new tokens to local storage immediately
+        if (data.access) localStorage.setItem("access", data.access);
+        if (data.refresh) localStorage.setItem("refresh", data.refresh); 
+
+        console.log("Session refreshed successfully.");
+        return true;
+
+    } catch (error) {
+        console.error("Token refresh failed:", error);
+        forceLogout();
+        return false;
+    }
+}
+
+function forceLogout() {
+    // Clear all auth data and redirect to login page
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    
+    // Optional: Keep workspace/org settings in localStorage so they remember where they were, 
+    // or run localStorage.clear() to wipe everything.
+    
+    window.location.href = "login.html"; 
+}
+
+// ==================== ROUTING SYSTEM ====================
+function initRouter() {
+    window.addEventListener('hashchange', handleRoute);
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const route = e.currentTarget.dataset.route;
+            if (route) window.location.hash = route;
+            // Close mobile sidebar if applicable
+            document.getElementById('sidebar')?.classList.remove('open');
+        });
+    });
+    handleRoute();
+}
+
+function handleRoute() {
+    let route = window.location.hash.replace('#', '') || 'overview';
+    document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+    
+    const targetView = document.getElementById(`view-${route}`);
+    if (targetView) targetView.classList.add('active');
+    else { document.getElementById('view-overview').classList.add('active'); route = 'overview'; }
+
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.route === route);
+    });
+}
+
+// ==================== DATA LOADING ====================
+async function loadWorkspaceData() {
+    if (!state.workspaceSlug || !state.activeOrgSlug) {
+        alert("Workspace context lost. Redirecting to dashboard.");
+        window.location.href = "dashboard.html";
+        return;
+    }
+
+    const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug });
+
+    try {
+        // Run fetches in parallel for speed
+        const [wsDetails, boards, notes, tasks] = await Promise.all([
+            fetchJSON(`${CONFIG.API_BASE}/workspace/details/${state.workspaceSlug}/`, headers).catch(() => ({ name: state.workspaceSlug, description: "Workspace Details" })),
+            fetchJSON(`${CONFIG.API_BASE}/board/workspaces/${state.workspaceSlug}/boards/`, headers).catch(() => []),
+            fetchJSON(`${CONFIG.API_BASE}/notes/workspaces/${state.workspaceSlug}/notes/`, headers).catch(() => []),
+            fetchJSON(`${CONFIG.API_BASE}/card/workspace/${state.workspaceSlug}/list/`, headers).catch(() => [])
         ]);
 
-        renderBoards(boards);
-        renderNotes(notes);
+        state.workspaceDetails = wsDetails;
+        state.boards = boards;
+        state.notes = notes;
+        state.tasks = tasks;
 
-        setupCreateBoard();
-        setupCreateNote();
-
-    } catch (err) {
-        console.error("Workspace load failed:", err);
-        alert("Failed to load workspace data");
+        renderUI();
+    } catch (e) {
+        console.error("Failed to load workspace data", e);
     }
 }
 
+// ==================== RENDERING UI ====================
+function renderUI() {
+    // Top-level text and stats
+    const nameStr = state.workspaceDetails.name || state.workspaceSlug;
+    const workspaceid = state.workspaceDetails.id || "";
+    const descStr = state.workspaceDetails.description || "";
+    
+    document.getElementById('sidebar-ws-name').textContent = nameStr;
+    document.getElementById('header-ws-name').textContent = nameStr;
+    document.getElementById('header-ws-desc').textContent = descStr;
 
-function setupCreateBoard() {
-    const input = document.getElementById("board-name-input");
-    const btn = document.getElementById("create-board-btn");
+    document.getElementById('stat-boards').textContent = state.boards.length;
+    document.getElementById('stat-tasks').textContent = state.tasks.length;
+    document.getElementById('stat-notes').textContent = state.notes.length;
 
-    if (!input || !btn) return;
+    renderBoards();
+    renderTasks();
+    renderNotes();
+}
 
-    btn.addEventListener("click", async () => {
-        const name = input.value.trim();
-        if (!name) return alert("Board name required");
+function renderBoards() {
+    const grid = document.getElementById('kanban-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    if (state.boards.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); grid-column: 1/-1;">No boards created yet.</div>';
+        return;
+    }
 
-        btn.disabled = true;
+    state.boards.forEach(b => {
+        const total = b.totalTasks || 0;
+        const comp = b.completedTasks || 0;
+        const prog = total === 0 ? 0 : Math.round((comp/total)*100);
+
+        const card = document.createElement('article');
+        card.className = 'card kanban-card';
+        card.dataset.name = (b.name || "").toLowerCase();
+        card.onclick = () => {
+            // Usually, this would redirect to the specific board URL
+            window.location.href = `board.html?slug=${b.slug}`;
+        };
+
+        card.innerHTML = `
+            <div class="kanban-card-header">
+                <div class="mini-board-icon"><div class="mini-board-col"></div><div class="mini-board-col"></div><div class="mini-board-col"></div></div>
+                <div>
+                    <h3 class="kanban-title">${b.name}</h3>
+                    <div class="kanban-meta">Active Board</div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:8px;">
+                <span>${comp}/${total} tasks</span><span>${prog}%</span>
+            </div>
+            <div class="kanban-progress-bar"><div class="kanban-progress-fill" style="width:${prog}%;"></div></div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function renderTasks() {
+    const list = document.getElementById('tasks-list-body');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    if (state.tasks.length === 0) {
+        list.innerHTML = '<div style="padding: 20px; color:var(--text-muted); text-align:center;">No tasks yet.</div>';
+        return;
+    }
+
+    state.tasks.forEach(t => {
+        const row = document.createElement('div');
+        const status = t.status || 'todo';
+        let statusText = status === 'in-progress' ? 'In Progress' : status === 'done' ? 'Done' : 'To Do';
+        
+        row.className = `task-row ${status === 'done' ? 'done' : ''}`;
+        row.dataset.title = (t.title || "").toLowerCase();
+        
+        row.innerHTML = `
+            <div class="task-col-main">
+                <div class="task-checkbox"></div>
+                <span class="task-title">${t.title}</span>
+            </div>
+            <div class="task-col-status">
+                <span class="task-status-pill status-${status}">${statusText}</span>
+            </div>
+            <div class="task-col-date">
+                ${new Date(t.created_at || Date.now()).toLocaleDateString()}
+            </div>
+        `;
+        
+        // Open Detail Modal
+        row.onclick = () => {
+            document.getElementById('detail-task-title').textContent = t.title;
+            document.getElementById('detail-task-desc').textContent = t.description || "No description provided.";
+            document.getElementById('detail-task-status').innerHTML = `<span class="task-status-pill status-${status}">${statusText}</span>`;
+            
+            const assigneeName = t.assignee?.name || "Unassigned";
+            const initials = assigneeName !== "Unassigned" ? assigneeName.substring(0,2).toUpperCase() : "?";
+            document.getElementById('detail-task-assignee').textContent = assigneeName;
+            document.getElementById('detail-task-avatar').textContent = initials;
+            
+            document.getElementById('task-detail-modal').style.display = 'flex';
+        };
+        list.appendChild(row);
+    });
+}
+
+function renderNotes() {
+    const grid = document.getElementById('notes-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    if (state.notes.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); grid-column: 1/-1;">No notes yet.</div>';
+        return;
+    }
+
+    state.notes.forEach(n => {
+        const card = document.createElement('article');
+        card.className = 'card note-card';
+        card.dataset.title = (n.title || "").toLowerCase();
+        card.onclick = () => {
+            const targetId = n.id || n.slug;
+            if(targetId) {
+                window.location.href = `note.html?id=${targetId}`;
+            } else {
+                alert("Note ID missing.");
+            }
+        };
+
+        card.innerHTML = `
+            <div class="note-header">
+                <h3 class="note-title">${n.title}</h3>
+                <span class="note-date">${new Date(n.created_at || Date.now()).toLocaleDateString()}</span>
+            </div>
+            <p class="note-preview">${n.content || "..."}</p>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// ==================== SEARCH / FILTERING ====================
+function initSearch() {
+    const bindSearch = (inputId, itemSelector, datasetKey) => {
+        document.getElementById(inputId)?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll(itemSelector).forEach(el => {
+                const matchVal = el.dataset[datasetKey] || "";
+                el.style.display = matchVal.includes(query) ? 'flex' : 'none';
+            });
+        });
+    };
+
+    bindSearch('search-boards', '.kanban-card', 'name');
+    bindSearch('search-tasks', '.task-row', 'title');
+    bindSearch('search-notes', '.note-card', 'title');
+
+    // Close task modal
+    document.getElementById('btn-close-task-detail')?.addEventListener('click', () => {
+        document.getElementById('task-detail-modal').style.display = 'none';
+    });
+    document.getElementById('task-detail-modal')?.addEventListener('click', (e) => {
+        if(e.target === e.currentTarget) e.target.style.display = 'none';
+    });
+    
+    // Topbar mobile menu
+    document.getElementById('mobileMenuToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
+    });
+}
+
+// ==================== CREATION MODAL LOGIC ====================
+function initModals() {
+    const modal = document.getElementById('creation-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const inputTitle = document.getElementById('modal-input-title');
+    const inputContent = document.getElementById('modal-input-content');
+    let creationType = null;
+
+    const openModal = (type, title, showContent = false) => {
+        creationType = type;
+        modalTitle.textContent = title;
+        inputTitle.value = '';
+        inputContent.value = '';
+        inputContent.style.display = showContent ? 'block' : 'none';
+        modal.style.display = 'flex';
+        inputTitle.focus();
+    };
+
+    document.getElementById('btn-create-kanban')?.addEventListener('click', () => openModal('board', 'New Kanban Board'));
+    document.getElementById('btn-create-task')?.addEventListener('click', () => openModal('task', 'New Task'));
+    document.getElementById('btn-create-note')?.addEventListener('click', () => openModal('note', 'New Note', true));
+
+    document.getElementById('modal-cancel')?.addEventListener('click', () => modal.style.display = 'none');
+
+    document.getElementById('modal-submit')?.addEventListener('click', async () => {
+        const title = inputTitle.value.trim();
+        const content = inputContent.value.trim();
+        const submitBtn = document.getElementById('modal-submit');
+        
+        if (!title) return alert("Title is required");
+
+        const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug });
 
         try {
-            await createBoard(name);
-            input.value = "";
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+            
+            let endpoint = "";
+            let payload = {};
 
-            const boards = await fetchBoards();
-            renderBoards(boards);
+            if (creationType === 'note') {
+                endpoint = `${CONFIG.API_BASE}/notes/workspaces/${state.workspaceSlug}/notes/`;
+                payload = { title, content };
+            } else if (creationType === 'board') {
+                endpoint = `${CONFIG.API_BASE}/board/workspaces/${state.workspaceSlug}/boards/`;
+                payload = { name: title };
+            } else if (creationType === 'task') {
+                endpoint = `${CONFIG.API_BASE}/card/boards/${boardSlug}/cards/`;
+                payload = { title };
+            }
 
-        } catch (err) {
-            console.error("Create board failed:", err);
-            alert("Failed to create board");
+            await postJSON(endpoint, payload, headers);
+            modal.style.display = 'none';
+            await loadWorkspaceData(); // Reload UI to show new item
+        } catch (e) {
+            alert(`Failed to create ${creationType}`);
         } finally {
-            btn.disabled = false;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create';
+        }
+    });
+
+    // Delete Workspace
+    document.getElementById('btn-delete-workspace')?.addEventListener('click', async () => {
+        if(prompt(`Type 'DELETE' to confirm deletion of this workspace:`) === 'DELETE') {
+            try {
+                // Adjust endpoint if needed
+                const res = await fetch(`${CONFIG.API_BASE}/workspace/delete/${state.workspaceDetails.id}/`, {
+    method: 'DELETE',
+    headers: {
+        ...authHeaders({ "X-ORG-SLUG": state.activeOrgSlug })
+    }
+});
+                if (!res.ok) throw new Error();
+                
+                alert('Workspace deleted.');
+                window.location.href = 'dashboard.html';
+            } catch (e) {
+                alert('Failed to delete workspace.');
+            }
         }
     });
 }
 
-function setupCreateNote() {
-    const titleInput = document.getElementById("note-title-input");
-    const contentInput = document.getElementById("note-content-input");
-    const btn = document.getElementById("create-note-btn");
+// ==================== INIT ====================
+document.addEventListener("DOMContentLoaded", async () => {
+    const isValidSession = await refreshAccessToken();
+    if (!isValidSession) return;
 
-    if (!titleInput || !contentInput || !btn) return;
+    initRouter();
+    initModals();
+    initSearch();
+    initHeartbeat();
+    
+    setInterval(refreshAccessToken, 8 * 60 * 1000);
+    
+    loadWorkspaceData();
+});
 
-    btn.addEventListener("click", async () => {
-        const title = titleInput.value.trim();
-        const content = contentInput.value.trim();
+// ==================== USER PRESENCE / HEARTBEAT SSE ====================
 
-        if (!title || !content) {
-            return alert("Title and content required");
-        }
+let heartbeatConnection = null;
 
-        btn.disabled = true;
+function initHeartbeat() {
+    const token = localStorage.getItem("access");
+    if (!token) return;
 
-        try {
-            await createNote(title, content);
+    // Adjust the URL to exactly match your backend's activity routing
+    const heartbeatEndpoint = `${CONFIG.API_BASE}/activity/status/?token=${token}`;
 
-            titleInput.value = "";
-            contentInput.value = "";
+    if (heartbeatConnection) heartbeatConnection.close();
+    
+    heartbeatConnection = new EventSource(heartbeatEndpoint);
 
-            const notes = await fetchNotes();
-            renderNotes(notes);
+    heartbeatConnection.onopen = () => {
+        console.log("🟢 Presence Heartbeat Connected.");
+    };
 
-        } catch (err) {
-            console.error("Create note failed:", err);
-            alert("Failed to create note");
-        } finally {
-            btn.disabled = false;
-        }
+    // IMPORTANT: Because your Python code yields `event: heartbeat`, 
+    // we MUST listen specifically for 'heartbeat', not 'message'.
+    heartbeatConnection.addEventListener('heartbeat', (event) => {
+        // event.data will be "1" based on your backend logic
+        console.log("💓 Heartbeat tick:", event.data); 
+        
+        // The simple act of receiving this keeps the connection open
+        // and keeps your backend Redis 'user:online:{id}' key refreshed!
     });
+
+    heartbeatConnection.onerror = (err) => {
+        console.warn("🔴 Heartbeat disconnected. Browser will auto-reconnect...", err);
+        // Do NOT call heartbeatConnection.close() here, 
+        // let the browser's native EventSource auto-reconnect continuously.
+    };
 }
-async function deleteWorkspace(workspaceId) {
-    const response = await fetch(
-        `${API_BASE}/workspace/delete/${workspaceId}`,
-        {
-            method: "DELETE",
-            headers: getHeaders()
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-    }
-
-    return true;
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    initWorkspaceDashboard()
-
-    document.getElementById("boards-list")?.addEventListener("click", e => {
-    const li = e.target.closest("li");
-    if (!li) return;
-
-    localStorage.setItem("current_board", li.dataset.slug);
-    localStorage.setItem("current_board_id", li.dataset.id);
-    window.location.href = "../html/boards.html";
-});
-
-
-    document.getElementById("notes-list")?.addEventListener("click", e => {
-    const li = e.target.closest("li");
-    if (!li) return;
-
-    localStorage.setItem("current_note", li.dataset.slug);
-    window.location.href = "../html/notes.html";
-});
-document.getElementById("delete-workspace-btn")?.addEventListener("click", async () => {
-
-    const workspaceId = localStorage.getItem("current_workspace_id"); // assuming slug is UUID
-
-    if (!workspaceId) {
-        return alert("No workspace selected");
-    }
-
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this workspace? This action cannot be undone."
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-        await deleteWorkspace(workspaceId);
-
-        alert("Workspace deleted successfully");
-
-        localStorage.removeItem("current_workspace");
-        window.location.href = "../html/dashboard.html"; // redirect after delete
-
-    } catch (err) {
-        console.error("Delete failed:", err);
-        alert("Failed to delete workspace");
-    }
-});
-
-
-});

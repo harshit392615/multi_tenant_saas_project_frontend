@@ -1,238 +1,229 @@
-/* =====================================================
-   THEME VARIABLES
-===================================================== */
+/* =========================================
+   1. Variables & Reset (Pure Dark Theme)
+   ========================================= */
 :root {
-    --bg-page: #f8fafc;
-    --bg-card: #ffffff;
-    --text-main: #111827;
-    --text-muted: #6b7280;
-
-    --border-default: #e5e7eb;
-    --border-focus: #3b82f6;
-    --border-error: #ef4444;
-
-    --bg-button: #111827;
-    --text-button: #ffffff;
-
-    --logo-bg: #111827;
-    --logo-icon: #ffffff;
-
-    --shadow-card: 0 10px 40px rgba(0,0,0,0.08);
-}
-
-/* DARK MODE */
-[data-theme="dark"] {
-    --bg-page: #0f172a;
-    --bg-card: #111827;
-    --text-main: #f9fafb;
+    --bg-body: #0a0a0a;
+    --bg-surface: #141414;
+    --text-main: #f3f4f6;
     --text-muted: #9ca3af;
+    --border-color: #27272a;
+    
+    --primary: #4f46e5;
+    --primary-hover: #6366f1;
+    --primary-text: #ffffff;
+    
+    --error: #ef4444;
+    --error-bg: rgba(239, 68, 68, 0.1);
+    --success: #22c55e;
 
-    --border-default: #1f2937;
-    --border-focus: #60a5fa;
-    --border-error: #f87171;
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
 
-    --bg-button: #ffffff;
-    --text-button: #111827;
-
-    --logo-bg: #ffffff;
-    --logo-icon: #111827;
-
-    --shadow-card: 0 10px 40px rgba(0,0,0,0.4);
+    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* =====================================================
-   BASE
-===================================================== */
-* {
+*, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg-page);
+    font-family: var(--font-stack);
+    background-color: var(--bg-body);
     color: var(--text-main);
-    transition: background 0.25s ease, color 0.25s ease;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* =====================================================
-   LAYOUT
-===================================================== */
-.login-container {
+a { text-decoration: none; color: inherit; transition: color 0.2s; }
+button { font-family: inherit; border: none; background: none; cursor: pointer; color: inherit; }
+
+/* =========================================
+   2. Layout & Card
+   ========================================= */
+.auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 24px;
 }
 
-.login-card {
+.auth-card {
     width: 100%;
-    max-width: 420px;
-    padding: 60px 40px;
-    background: var(--bg-card);
-    border-radius: 14px;
-    box-shadow: var(--shadow-card);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    max-width: 440px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 40px;
 }
 
-.login-card:hover {
-    transform: translateY(-4px);
-}
-
-/* =====================================================
-   HEADER
-===================================================== */
-.login-header {
+/* =========================================
+   3. Header & Logo
+   ========================================= */
+.auth-header {
     text-align: center;
-    margin-bottom: 40px;
-    position: relative;
+    margin-bottom: 32px;
 }
 
-.logo-wrapper {
-    display: flex;
+.logo { 
+    display: inline-flex; 
+    align-items: center; 
     justify-content: center;
-    margin-bottom: 16px;
+    gap: 8px; 
+    font-weight: 700; 
+    font-size: 1.25rem; 
+    margin-bottom: 24px;
 }
 
-h1 {
-    font-size: 1.9rem;
+.logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+}
+
+.auth-header h1 {
+    font-size: 1.75rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
-/* Theme Button */
-.theme-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: none;
-    border: 1px solid var(--border-default);
-    border-radius: 6px;
-    padding: 6px 8px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.theme-toggle:hover {
-    border-color: var(--border-focus);
-}
-
-/* =====================================================
-   FORM
-===================================================== */
-.form-group {
-    margin-bottom: 22px;
-}
+/* =========================================
+   4. Form & Inputs
+   ========================================= */
+.form-group { margin-bottom: 16px; }
 
 label {
-    font-size: 13px;
+    font-size: 0.85rem;
     font-weight: 500;
-    color: var(--text-muted);
-    margin-bottom: 6px;
+    color: var(--text-main);
+    margin-bottom: 8px;
     display: block;
 }
 
+.input-wrapper { position: relative; }
+
 input {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-default);
-    background: transparent;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--bg-body);
     color: var(--text-main);
-    transition: border 0.2s ease, box-shadow 0.2s ease;
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
+
+input::placeholder { color: var(--text-muted); }
 
 input:focus {
     outline: none;
-    border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
-input.error {
-    border-color: var(--border-error);
+input.invalid {
+    border-color: var(--error);
+    background-color: var(--error-bg);
 }
+input.invalid:focus { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
 
-/* =====================================================
-   PASSWORD TOGGLE
-===================================================== */
-.password-wrapper {
-    position: relative;
-}
-
-.password-wrapper input {
-    padding-right: 40px;
-}
-
-.toggle-btn {
+.toggle-password {
     position: absolute;
+    right: 12px;
     top: 50%;
-    right: 8px;
     transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
     color: var(--text-muted);
+    font-size: 1.1rem;
+    padding: 4px;
 }
+.toggle-password:hover { color: var(--text-main); }
 
-.toggle-btn:hover {
-    color: var(--text-main);
-}
-
-/* =====================================================
-   BUTTON
-===================================================== */
-.btn-primary {
-    width: 100%;
-    padding: 11px;
-    background: var(--bg-button);
-    color: var(--text-button);
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: transform 0.1s ease, opacity 0.2s ease;
-}
-
-.btn-primary:hover {
-    opacity: 0.9;
-}
-
-.btn-primary:active {
-    transform: scale(0.98);
-}
-
-/* =====================================================
-   LINKS
-===================================================== */
-.login-footer {
-    margin-top: 30px;
-    text-align: center;
-    font-size: 14px;
-}
-
-.link-secondary {
-    color: var(--text-muted);
-}
-
-.link-primary {
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-/* =====================================================
-   ERRORS
-===================================================== */
 .error-msg {
-    font-size: 12px;
-    color: var(--border-error);
-    margin-top: 4px;
+    display: block;
+    font-size: 0.8rem;
+    color: var(--error);
     min-height: 18px;
+    margin-top: 6px;
 }
 
-.global-error {
-    margin-top: 16px;
+/* =========================================
+   5. Buttons & Status
+   ========================================= */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn--primary {
+    background: var(--primary);
+    color: var(--primary-text);
+}
+.btn--primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.full-width { width: 100%; }
+
+.form-status { margin-top: 16px; text-align: center; font-size: 0.9rem; font-weight: 500; }
+.form-status.success { color: var(--success); }
+.form-status.error { color: var(--error); }
+
+/* =========================================
+   6. Footer & Links
+   ========================================= */
+.auth-footer {
     text-align: center;
-    font-weight: 500;
-    color: var(--border-error);
+    margin-top: 24px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.link-primary { color: var(--primary); font-weight: 600; }
+.link-primary:hover { color: var(--primary-hover); text-decoration: underline; }
+
+.link-secondary { color: var(--text-muted); transition: color 0.2s; }
+.link-secondary:hover { color: var(--text-main); }
+
+/* =========================================
+   7. Mobile Responsiveness
+   ========================================= */
+@media (max-width: 480px) {
+    .auth-container { padding: 16px; }
+    .auth-card { padding: 32px 24px; }
+    .auth-header h1 { font-size: 1.5rem; }
+}
+
+/* =========================================
+   8. Modal Overlay
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.btn--outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+.btn--outline:hover { background: var(--bg-surface); }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

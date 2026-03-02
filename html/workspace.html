@@ -3,152 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workspace</title>
-    <!-- We keep the link, but our new styles in <style> will override/enhance -->
-    <link rel="stylesheet" href="../css/workspace.css">
-    <style>
-        /* See CSS section below for the injected styles */
-    </style>
+    <title>Workspace - Nexus</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
 
-    <div class="app-layout">
-        
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="user-profile">
-                    <div class="avatar">W</div>
-                    <span class="username">Workspace</span>
-                </div>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header" style="margin-bottom: 16px;">
+                <a href="dashboard.html" class="nav-item" style="color: var(--text-muted); font-size: 13px;">
+                    <span class="icon">←</span> Back to Dashboard
+                </a>
             </div>
-
-            <!-- Visual Sidebar Search -->
-            <div class="sidebar-search" id="sidebar-search-trigger">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input-ghost" placeholder="Search..." id="sidebar-search-input">
+            
+            <div style="padding: 0 12px; margin-bottom: 24px;">
+                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 8px;">Current Workspace</div>
+                <h2 id="sidebar-ws-name" style="font-size: 16px; color: var(--text-primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</h2>
             </div>
 
             <nav class="sidebar-nav">
-                <!-- Overview / Favorites -->
-                <div class="nav-section">
-                    <div class="nav-header">Favorites</div>
-                    <!-- Added ID for JS targeting -->
-                    <a href="#" class="nav-item active" id="nav-overview">
-                        <span class="icon">🏠</span> Overview
-                    </a>
-                </div>
-                
-                <!-- Collapsible Private Section -->
-                <div class="nav-section collapsible-section" id="private-section">
-                    <!-- Added toggle functionality to header -->
-                    <div class="nav-header toggle-header">
-                        <span class="arrow-icon">▶</span> Private
-                    </div>
-                    <div class="section-content">
-                        <a href="#boards" class="nav-item" id="nav-boards">
-                            <span class="icon">📋</span> Boards
-                        </a>
-                        <a href="#notes" class="nav-item" id="nav-notes">
-                            <span class="icon">📝</span> Notes
-                        </a>
-                    </div>
-                </div>
+                <ul class="nav-list">
+                    <li class="nav-item active" data-route="overview">
+                        <span class="icon">⊞</span> Overview
+                    </li>
+                    <li class="nav-item" data-route="boards">
+                        <span class="icon">⏸</span> Kanban Boards
+                    </li>
+                    <li class="nav-item" data-route="tasks">
+                        <span class="icon">☑</span> Tasks
+                    </li>
+                    <li class="nav-item" data-route="notes">
+                        <span class="icon">📄</span> Notes
+                    </li>
+                    <li class="nav-item" data-route="settings">
+                        <span class="icon">⚙</span> Settings
+                    </li>
+                </ul>
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT AREA -->
         <main class="main-content">
-            
-            <!-- TOP NAVBAR -->
-            <header class="top-nav">
-                <div class="breadcrumbs">
-                    <span class="crumb">Dashboard</span>
-                    <span class="separator">/</span>
-                    <h1 id="workspace-title" class="crumb current">Loading...</h1>
-                </div>
-                
-                <!-- Navbar Search & Actions -->
-                <div class="nav-actions">
-                    <!-- New Navbar Search -->
-                    <div class="navbar-search-wrapper">
-                        <span class="search-icon-sm">🔍</span>
-                        <input type="text" id="navbar-search-input" placeholder="Search boards & notes..." />
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="mobileMenuToggle" class="mobile-toggle">☰</button>
+                    <div class="search-bar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="Search in workspace..." aria-label="Search">
                     </div>
-                    <button class="icon-btn">•••</button>
-                    <button id="delete-workspace-btn" class="btn-danger">
-    Delete Workspace
-</button>
-
+                </div>
+                <div class="topbar-right">
+                    <div class="user-avatar">U</div>
                 </div>
             </header>
 
-            <div class="scroll-container">
-                <div class="content-wrapper">
-
-                    <!-- BOARDS SECTION -->
-                    <section class="module-section" id="view-boards">
-                        <div class="section-header">
-                            <h2>Boards</h2>
+            <div id="view-container">
+                
+                <div id="view-container">
+                
+                <div id="view-overview" class="page-view active">
+                    <header class="view-header">
+                        <h1 id="header-ws-name">Workspace Overview</h1>
+                        <p id="header-ws-desc">Manage all your specific projects and documents here.</p>
+                    </header>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-icon blue">⏸</span>
+                            <div class="stat-value" id="stat-boards">0</div>
+                            <div class="stat-label">Active Boards</div>
                         </div>
-
-                        <div class="creation-row">
-                            <div class="input-group">
-                                <input
-                                    type="text"
-                                    id="board-name-input"
-                                    class="notion-input"
-                                    placeholder="New board name..."
-                                />
-                                <button id="create-board-btn" class="btn-primary">New Board</button>
-                            </div>
+                        <div class="stat-card">
+                            <span class="stat-icon orange">☑</span>
+                            <div class="stat-value" id="stat-tasks">0</div>
+                            <div class="stat-label">Total Tasks</div>
                         </div>
+                        <div class="stat-card">
+                            <span class="stat-icon green">📄</span>
+                            <div class="stat-value" id="stat-notes">0</div>
+                            <div class="stat-label">Notes</div>
+                        </div>
+                    </div>
+                </div>
 
-                        <ul id="boards-list" class="grid-list">
-                            <!-- JS populates <li> items here -->
-                        </ul>
+                <div id="view-boards" class="page-view">
+                    <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                        <div>
+                            <h1>Kanban Boards</h1>
+                            <p>Workflow boards in this workspace.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btn-create-kanban"><span>+</span> New Board</button>
+                    </header>
+                    <div class="search-bar" style="margin-bottom: 24px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-boards" placeholder="Search boards...">
+                    </div>
+                    <div id="kanban-grid" class="card-grid kanban-grid"></div>
+                </div>
+
+                <div id="view-tasks" class="page-view">
+                    <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                        <div>
+                            <h1>Workspace Tasks</h1>
+                            <p>All tasks across this workspace.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btn-create-task"><span>+</span> New Task</button>
+                    </header>
+                    <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                        <div class="search-bar" style="flex: 1;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="search-tasks" placeholder="Search tasks...">
+                        </div>
+                    </div>
+                    <div class="task-list-container">
+                        <div class="task-list-header">
+                            <div class="task-col-main">Task Name</div>
+                            <div class="task-col-status">Status</div>
+                            <div class="task-col-date">Created</div>
+                        </div>
+                        <div id="tasks-list-body"></div>
+                    </div>
+                </div>
+
+                <div id="view-notes" class="page-view">
+                    <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                        <div>
+                            <h1>Notes</h1>
+                            <p>Documentation and minutes for this workspace.</p>
+                        </div>
+                        <button class="btn btn--primary" id="btn-create-note"><span>+</span> New Note</button>
+                    </header>
+                    <div class="search-bar" style="margin-bottom: 24px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-notes" placeholder="Search notes...">
+                    </div>
+                    <div id="notes-grid" class="card-grid notes-grid"></div>
+                </div>
+
+                <div id="view-settings" class="page-view">
+                    <header class="view-header">
+                        <h1>Workspace Settings</h1>
+                    </header>
+                    <section class="card danger-zone">
+                        <div style="flex: 1;">
+                            <h3 style="color: #ef4444; font-size: 16px; margin-bottom: 4px;">Delete Workspace</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Permanently delete this workspace and all contained data.</p>
+                        </div>
+                        <button class="btn btn--danger" id="btn-delete-workspace">Delete</button>
                     </section>
+                </div>
+            </div>
+                </div>
 
-                    <div class="divider" id="main-divider"></div>
-
-                    <!-- NOTES SECTION -->
-                    <section class="module-section" id="view-notes">
-                        <div class="section-header">
-                            <h2>Notes</h2>
+                <div id="view-boards" class="page-view">
+                    <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                        <div>
+                            <h1>Kanban Boards</h1>
                         </div>
+                        <button class="btn btn--primary" id="btn-create-kanban"><span>+</span> New Board</button>
+                    </header>
+                    <div id="kanban-grid" class="card-grid kanban-grid"></div>
+                </div>
 
-                        <div class="creation-card">
-                            <input
-                                type="text"
-                                id="note-title-input"
-                                class="notion-input title-input"
-                                placeholder="Note title"
-                            />
-                            <textarea
-                                id="note-content-input"
-                                class="notion-textarea"
-                                placeholder="Write something..."
-                                rows="3"
-                            ></textarea>
-                            <div class="card-actions">
-                                <button id="create-note-btn" class="btn-secondary">Add Note</button>
-                            </div>
+                <div id="view-tasks" class="page-view">
+                    <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                        <div>
+                            <h1>Tasks</h1>
                         </div>
+                        <button class="btn btn--primary" id="btn-create-task"><span>+</span> New Task</button>
+                    </header>
+                    <div class="task-list-container">
+                        <div class="task-list-header">
+                            <div class="task-col-main">Task Name</div>
+                            <div class="task-col-status">Status</div>
+                        </div>
+                        <div id="tasks-list-body"></div>
+                    </div>
+                </div>
 
-                        <ul id="notes-list" class="row-list">
-                            <!-- JS populates <li> items here -->
-                        </ul>
+                <div id="view-notes" class="page-view">
+                    <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+                        <div>
+                            <h1>Notes</h1>
+                        </div>
+                        <button class="btn btn--primary" id="btn-create-note"><span>+</span> New Note</button>
+                    </header>
+                    <div id="notes-grid" class="card-grid notes-grid"></div>
+                </div>
+
+                <div id="view-settings" class="page-view">
+                    <header class="view-header">
+                        <h1>Workspace Settings</h1>
+                    </header>
+                    <section class="card danger-zone">
+                        <div style="flex: 1;">
+                            <h3 style="color: #ef4444; font-size: 16px; margin-bottom: 4px;">Delete Workspace</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Permanently delete this workspace and all contained data.</p>
+                        </div>
+                        <button class="btn btn--danger" id="btn-delete-workspace">Delete</button>
                     </section>
-
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Existing Javascript (Untouched) -->
-    <script src="../js/workspace.js"></script>
+    <div id="creation-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card" style="max-width: 500px;">
+            <h3 id="modal-title">Create</h3>
+            <input type="text" id="modal-input-title" class="premium-input" placeholder="Title..." style="margin-bottom: 12px;">
+            <textarea id="modal-input-content" class="premium-input" rows="4" placeholder="Content (Optional)..." style="margin-bottom: 24px; display: none;"></textarea>
+            <div class="modal-actions">
+                <button class="btn btn--outline" id="modal-cancel">Cancel</button>
+                <button class="btn btn--primary" id="modal-submit">Create</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Enhanced Workspace Logic -->
-    <script src="../js/workspace-enhanced.js"></script>
+    <script src="../js/workspace.js"></script>
 </body>
 </html>

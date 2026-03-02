@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Accept your invitation to join a Nexus organization.">
+    <title>Accept Invitation - Nexus</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+
+<main class="auth-container">
+    <div class="auth-card" style="text-align: center; padding: 40px 32px;">
+        
+        <header class="auth-header" style="margin-bottom: 24px;">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 6L10 18M6 6H8L10 12L12 6H14V18H12L10 12L8 18H6V6Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <div id="state-error" style="display: none;">
+            <div style="font-size: 40px; margin-bottom: 16px;">⚠️</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Invalid Link</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+                This invitation link is invalid or missing information. Please ask your admin to resend the invite.
+            </p>
+            <a href="dashboard.html" class="btn btn--outline full-width">Go to Dashboard</a>
+        </div>
+
+        <div id="state-unauth" style="display: none;">
+            <div style="font-size: 40px; margin-bottom: 16px;">🔒</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Login Required</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+                You need to log in to your Nexus account to accept this invitation.
+            </p>
+            <button id="btn-go-login" class="btn btn--primary full-width">Log In to Accept</button>
+            <p style="margin-top: 16px; font-size: 0.9rem; color: var(--text-muted);">
+                Don't have an account? <a href="signup.html" class="link-primary">Sign up</a>
+            </p>
+        </div>
+
+        <div id="state-auth" style="display: none;">
+            <div style="font-size: 40px; margin-bottom: 16px;">🤝</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Join Organization</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+                You've been invited to join a team on Nexus. Click below to accept the invitation and access the workspace.
+            </p>
+            <button id="btn-accept-invite" class="btn btn--primary full-width">Accept Invitation</button>
+            
+            <div id="status-message" class="form-status" style="margin-top: 16px;" role="alert"></div>
+        </div>
+
+    </div>
+</main>
+
+<script src="../js/accept-invite.js"></script>
+</body>
+</html>

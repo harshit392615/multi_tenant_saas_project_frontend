@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Editor - Nexus</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <style>
+        .editor-topbar { background: var(--bg-surface); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 20; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;}
+        .editor-title-input { background: transparent; border: none; color: var(--text-primary); font-size: 18px; font-weight: 600; width: 100%; max-width: 400px; outline: none; padding: 4px 8px; border-radius: var(--radius-sm); transition: background 0.2s; }
+        .editor-title-input:focus { background: var(--bg-input); }
+        .save-status { font-size: 12px; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 8px;}
+        .save-status.connected::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+        .save-status.disconnected::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+        
+        .editor-main { flex: 1; overflow-y: auto; padding: 40px 24px; background: var(--bg-app); min-height: calc(100vh - 60px);}
+        .editor-container { max-width: 800px; margin: 0 auto; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); min-height: 60vh; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        
+        /* contenteditable="plaintext-only" is crucial here for your OT math */
+        .editor-canvas { padding: 48px; min-height: 100%; outline: none; color: var(--text-primary); font-size: 15px; line-height: 1.7; white-space: pre-wrap; font-family: var(--font-stack); }
+        .editor-canvas[placeholder]:empty:before { content: attr(placeholder); color: var(--text-muted); cursor: text; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" style="display: flex; flex-direction: column; height: 100vh;">
+        <header class="editor-topbar">
+            <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+                <button class="btn btn--outline" id="btn-back" style="padding: 6px 12px; font-size: 13px;">← Back</button>
+                <input type="text" id="note-title-input" class="editor-title-input" placeholder="Untitled Note" autocomplete="off">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span id="ws-status" class="save-status disconnected">Connecting...</span>
+                <button class="icon-btn" id="btn-delete-note" title="Delete Note" style="color: #ef4444;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="editor-main">
+            <div class="editor-container">
+                <div id="editor-canvas" class="editor-canvas" contenteditable="plaintext-only" placeholder="Start writing your note here..."></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/note.js"></script>
+</body>
+</html>

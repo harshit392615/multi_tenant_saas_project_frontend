@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Boards - Nexus</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <style>
+        /* Specific Kanban Board Styles */
+        .board-canvas {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            padding: 24px;
+            overflow-x: auto;
+            /* Height = viewport - topbar height */
+            height: calc(100vh - 70px); 
+        }
+
+        .kanban-col {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            min-width: 300px;
+            width: 300px;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kanban-col-header {
+            padding: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kanban-col-body {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 150px; /* Drop target area */
+            transition: background 0.2s;
+        }
+
+        .kanban-col-body.drag-over { background: var(--bg-surface-hover); }
+
+        .k-card {
+            background: var(--bg-body);
+            border: 1px solid var(--border-light);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            cursor: grab;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .k-card:hover { border-color: var(--primary); }
+        .k-card:active { cursor: grabbing; }
+        .k-card.dragging { opacity: 0.5; transform: scale(0.95); }
+
+        .add-card-btn {
+            padding: 12px 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: var(--transition);
+            border-top: 1px solid var(--border-light);
+        }
+        .add-card-btn:hover { color: var(--primary); background: var(--bg-surface-hover); }
+        
+        /* Empty State for Board Canvas */
+        .empty-board-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header" style="margin-bottom: 16px;">
+                <a href="workspace.html#boards" class="nav-item" style="color: var(--text-muted); font-size: 13px;">
+                    <span class="icon">←</span> Back to Workspace
+                </a>
+            </div>
+            
+            <div style="padding: 0 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">All Boards</div>
+                <button class="icon-btn" id="btn-new-board-sidebar" title="New Board" style="font-size: 16px; width: 24px; height: 24px;">+</button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list" id="sidebar-boards-list">
+                    <li style="padding: 12px; color: var(--text-muted); font-size: 13px;">Loading boards...</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar" style="border-bottom: 1px solid var(--border-light);">
+                <div class="topbar-left" style="display: flex; align-items: center; gap: 16px;">
+                    <button id="mobileMenuToggle" class="mobile-toggle">☰</button>
+                    <h1 id="board-name-display" style="font-size: 18px; margin: 0;">Select a Board</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="user-avatar">U</div>
+                </div>
+            </header>
+
+            <div class="board-canvas" id="board-canvas">
+                <div class="empty-board-state">
+                    <div style="font-size: 40px; margin-bottom: 16px;">⏸</div>
+                    <h3>No Board Selected</h3>
+                    <p>Select a board from the sidebar to view its cards.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="card-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card" style="max-width: 600px; width: 100%;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                <h3 id="card-modal-title">Edit Card</h3>
+                <button class="icon-btn" id="btn-close-card" style="margin-top: -8px;">✕</button>
+            </div>
+            
+            <input type="hidden" id="card-slug-input">
+            <input type="hidden" id="card-id-input">
+            <input type="hidden" id="card-status-input">
+
+            <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: block;">Title</label>
+            <input type="text" id="card-title-input" class="premium-input" style="margin-bottom: 16px;">
+
+            <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: block;">Description</label>
+            <textarea id="card-desc-input" class="premium-input" rows="5" style="margin-bottom: 24px; resize: vertical;"></textarea>
+
+            <div class="modal-actions" style="display: flex; justify-content: space-between;">
+                <button class="btn" id="btn-delete-card" style="color: #ef4444; background: transparent;">Delete</button>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn--outline" id="btn-cancel-card">Cancel</button>
+                    <button class="btn btn--primary" id="btn-save-card">Save Card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/board.js"></script>
+</body>
+</html>

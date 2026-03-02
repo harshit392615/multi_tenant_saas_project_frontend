@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* =====================================================
-       1. ELEMENTS
-    ===================================================== */
-    const html = document.documentElement;
     const form = document.getElementById('signupForm');
     const nameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
@@ -11,40 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmInput = document.getElementById('confirmPassword');
     const statusDiv = document.getElementById('formStatus');
     const toggleButtons = document.querySelectorAll('.toggle-password');
-    const themeToggle = document.getElementById('theme-toggle');
-
 
     /* =====================================================
-       2. THEME TOGGLE (Persistent)
-    ===================================================== */
-    const savedTheme = localStorage.getItem('theme');
-
-    if (savedTheme) {
-        html.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-    }
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const current = html.getAttribute('data-theme');
-            const newTheme = current === 'dark' ? 'light' : 'dark';
-
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-    }
-
-    function updateThemeIcon(theme) {
-        const icon = themeToggle?.querySelector('.toggle-icon');
-        if (icon) {
-            icon.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-    }
-
-
-    /* =====================================================
-       3. PASSWORD VISIBILITY TOGGLE
+       1. PASSWORD VISIBILITY TOGGLE
     ===================================================== */
     toggleButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -55,26 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isPassword = input.type === 'password';
             input.type = isPassword ? 'text' : 'password';
-
-            btn.setAttribute(
-                'aria-label',
-                isPassword ? 'Hide password' : 'Show password'
-            );
-
-            // Optional icon swap (if using icon-eye / icon-eye-off)
-            const iconEye = btn.querySelector('.icon-eye');
-            const iconOff = btn.querySelector('.icon-eye-off');
-
-            if (iconEye && iconOff) {
-                iconEye.classList.toggle('hidden');
-                iconOff.classList.toggle('hidden');
-            }
+            btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+            // Change the eye icon slightly when visible (optional visual feedback)
+            btn.style.opacity = isPassword ? '1' : '0.6';
         });
     });
 
-
     /* =====================================================
-       4. VALIDATION HELPERS
+       2. VALIDATION & ERROR HELPERS
     ===================================================== */
     const setError = (input, message) => {
         const errorSpan = document.getElementById(input.id + 'Error');
@@ -95,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return re.test(String(email).toLowerCase());
     };
 
-    // Live validation clearing
+    // Live validation clearing when user types
     [nameInput, emailInput, passInput, confirmInput].forEach(input => {
         input?.addEventListener('input', () => {
             clearError(input);
@@ -104,22 +57,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-
     /* =====================================================
-       5. FORM SUBMIT
+       3. FORM SUBMIT (Client-side checks)
     ===================================================== */
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         let isValid = true;
 
-        // Name
         if (nameInput.value.trim() === '') {
             setError(nameInput, 'Full name is required');
             isValid = false;
         }
 
-        // Email
         if (emailInput.value.trim() === '') {
             setError(emailInput, 'Email is required');
             isValid = false;
@@ -128,13 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isValid = false;
         }
 
-        // Password
         if (passInput.value.length < 8) {
             setError(passInput, 'Password must be at least 8 characters');
             isValid = false;
         }
 
-        // Confirm
         if (confirmInput.value !== passInput.value) {
             setError(confirmInput, 'Passwords do not match');
             isValid = false;
@@ -145,17 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
         await handleSignup();
     });
 
-
     /* =====================================================
-       6. API SIGNUP LOGIC
+       4. API SIGNUP LOGIC (Backend error mapping)
+    ===================================================== */
+    /* =====================================================
+       4. API SIGNUP LOGIC (Backend error mapping & Success UI)
     ===================================================== */
     async function handleSignup() {
-
         const submitBtn = form.querySelector('button[type="submit"]');
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating account...';
-
         statusDiv.textContent = '';
         statusDiv.className = 'form-status';
 
@@ -166,49 +114,64 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch(
-                'https://multi-tenant-saas-project.onrender.com/api/auth/signup/',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+            const response = await fetch('http://127.0.0.1:8000/api/auth/signup/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(
-                    data.message ||
-                    data.detail ||
-                    'Signup failed. Please try again.'
-                );
+                let hasFieldErrors = false;
+
+                const errors = data.error || data;
+
+                if (typeof errors === 'object' && errors !== null) {
+                    for (const key in errors) {
+                        const inputField = document.getElementById(key);
+                        if (inputField) {
+                            hasFieldErrors = true;
+                            const errorText = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
+                            setError(inputField, errorText);
+                        }
+                    }
+                }
+
+                if (!hasFieldErrors) {
+                    throw new Error(errors.message || errors.detail || errors.error || 'Signup failed. Please try again.');
+                } else {
+                    throw new Error('Please fix the errors above.');
+                }
             }
 
-            // Success
-            statusDiv.className = 'form-status success';
-            statusDiv.textContent = 'Account created successfully! Redirecting...';
+            // --- UI Swap on Success ---
+            const formContainer = document.getElementById('signupFormContainer');
+            const successScreen = document.getElementById('successScreen');
+            const emailDisplay = document.getElementById('userEmailDisplay');
+            const headerTitle = document.getElementById('headerTitle');
 
-            if (data.token) {
-                localStorage.setItem('authToken', data.token);
-            }
-
-            setTimeout(() => {
-                window.location.href = '../html/login.html';
-            }, 1000);
+            // Hide the form and the "Create your account" title
+            formContainer.style.display = 'none';
+            headerTitle.style.display = 'none';
+            
+            // Inject the user's email into the success screen
+            emailDisplay.textContent = payload.email;
+            
+            // Show the success screen
+            successScreen.style.display = 'block';
 
         } catch (error) {
-
             console.error('Signup Error:', error);
-
             statusDiv.className = 'form-status error';
-            statusDiv.textContent = error.message;
-
+            
+            if (error.message !== 'Please fix the errors above.') {
+                statusDiv.textContent = error.message;
+            }
+            
+            // Only reset the button if there was an error
             submitBtn.disabled = false;
             submitBtn.textContent = 'Sign up';
         }
     }
-
 });

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,73 +9,80 @@
 </head>
 <body>
 
-    <main class="login-container">
-        <div class="login-card">
-            <!-- Header Section -->
-            <header class="login-header">
-                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-    <span class="toggle-icon">🌙</span>
-</button>
-
-                <div class="logo-wrapper">
-                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24">
-    <rect width="24" height="24" rx="6" fill="var(--logo-bg)"/>
-    <path d="M7 6V18H9.5L14.5 10V18H17V6H14.5L9.5 14V6H7Z"
-          fill="var(--logo-icon)"/>
-</svg>
+<main class="auth-container">
+    <div class="auth-card">
+        <header class="auth-header">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 6L10 18M6 6H8L10 12L12 6H14V18H12L10 12L8 18H6V6Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
-                <h1>Log in</h1>
-            </header>
+                <span class="logo-text">Nexus</span>
+            </a>
+            <h1>Welcome back</h1>
+        </header>
 
-            <!-- Login Form -->
-            <form id="loginForm" class="login-form" novalidate>
-                
-                <!-- Email Field -->
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email address" autocomplete="email" required>
-                    <span class="error-msg" id="emailError"></span>
+        <form id="loginForm" class="auth-form" novalidate>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" autocomplete="email" required>
+                <span class="error-msg" id="emailError" aria-live="polite"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="toggle-password" data-target="password" aria-label="Show password">👁</button>
                 </div>
-
-                <!-- Password Field -->
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
-                        <button type="button" id="togglePassword" class="toggle-btn" aria-label="Show password">
-                            <!-- Eye Icon -->
-                            <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                            <!-- Eye Off Icon (Hidden by default) -->
-                            <svg class="icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                <line x1="1" y1="1" x2="23" y2="23"></line>
-                            </svg>
-                        </button>
-                    </div>
-                    <span class="error-msg" id="passwordError"></span>
+                <span class="error-msg" id="passwordError" aria-live="polite"></span>
+                <div style="text-align: right; margin-top: 4px;">
+                    <a href="#" id="forgot-password-link" class="link-secondary" style="font-size: 0.85rem;">Forgot password?</a>
                 </div>
+            </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn-primary">Continue</button>
+            <button type="submit" class="btn btn--primary full-width" style="margin-top: 12px;">Log in</button>
 
-                <!-- Global Form Error -->
-                <div id="globalError" class="global-error" role="alert" aria-live="polite"></div>
-            </form>
+            <div id="formStatus" class="form-status" role="alert"></div>
+        </form>
 
-            <!-- Footer Links -->
-            <footer class="login-footer">
-                <a href="#" class="link-secondary">Forgot password?</a>
-                <div class="divider">
-                    <span>Don't have an account?</span>
-                    <a href="signup.html" class="link-primary">Sign up</a>
-                </div>
-            </footer>
+        <footer class="auth-footer">
+            <p>Don't have an account? <a href="signup.html" class="link-primary">Sign up</a></p>
+        </footer>
+    </div>
+</main>
+<div id="forgot-password-modal" class="modal-overlay" style="display: none;">
+    <div class="auth-card" style="padding: 32px; max-width: 400px; text-align: center; margin: 20px;">
+        
+        <div id="fp-form-state">
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px; color: var(--text-main);">Reset Password</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+                Enter your email address and we'll send you a link to reset your password.
+            </p>
+            
+            <input type="email" id="fp-email-input" placeholder="name@company.com" required
+                   style="width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); font-size: 1rem; margin-bottom: 8px;">
+            <div id="fp-error" class="error-msg" style="margin-bottom: 16px; min-height: 18px;"></div>
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="btn btn--outline" id="btn-cancel-fp" style="flex: 1;">Cancel</button>
+                <button class="btn btn--primary" id="btn-send-fp" style="flex: 1;">Send Link</button>
+            </div>
         </div>
-    </main>
 
-    <script src="../js/login.js"></script>
+        <div id="fp-success-state" style="display: none;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">✉️</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px; color: var(--text-main);">Check your email</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+                We've sent a password reset link to <strong id="fp-success-email" style="color: var(--text-main);"></strong>.
+            </p>
+            <button class="btn btn--primary full-width" id="btn-close-fp">Back to Login</button>
+        </div>
+
+    </div>
+</div>
+<script src="../js/login.js"></script>
 </body>
 </html>
