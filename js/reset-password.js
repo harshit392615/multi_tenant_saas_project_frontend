@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Replace with your actual backend endpoint
-            const response = await fetch('https://multi-tenant-saas-project.onrender.comsaas-project.onrender.com/api/auth/forgot-password-reset/', {
+            const response = await fetch('https://multi-tenant-saas-project.onrender.com/api/auth/forgot-password-reset/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

@@ -1,6 +1,6 @@
 // ==================== CONFIG & STATE ====================
 const CONFIG = {
-    API_BASE: "https://multi-tenant-saas-project.onrender.comsaas-project.onrender.com/api",
+    API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
     ENDPOINTS: {
         ORG_LIST: "/organization/list/",
         ORG_CREATE: "/organization/create/",
