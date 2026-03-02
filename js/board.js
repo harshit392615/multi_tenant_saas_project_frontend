@@ -35,6 +35,7 @@ async function apiFetch(url, options = {}) {
         const refreshed = await refreshAccessToken();
         
         if (refreshed) {
+            // Update the token in headers and retry the original request
             const newToken = localStorage.getItem("access");
             options.headers = {
                 ...options.headers,
@@ -57,9 +58,11 @@ async function apiFetch(url, options = {}) {
 }
 
 // ---------------------------------------------------------
-// AUTOMATIC HEADER INJECTION FOR ALL REQUESTS
+// FIXED: AUTOMATIC HEADER INJECTION FOR ALL REQUESTS
 // ---------------------------------------------------------
+
 async function fetchJSON(url, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every fetch request
     const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -67,6 +70,7 @@ async function fetchJSON(url, customHeaders = {}) {
 }
 
 async function postJSON(url, body, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every post request
     const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, {
         method: "POST",
@@ -78,6 +82,7 @@ async function postJSON(url, body, customHeaders = {}) {
 }
 
 async function patchJSON(url, body, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every patch request
     const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, {
         method: "PATCH",
@@ -89,6 +94,7 @@ async function patchJSON(url, body, customHeaders = {}) {
 }
 
 async function putJSON(url, body, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every put request
     const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, {
         method: "PUT",
@@ -100,6 +106,7 @@ async function putJSON(url, body, customHeaders = {}) {
 }
 
 async function deleteJSON(url, customHeaders = {}, body = null) {
+    // Automatically injects Token + Org Slug into every delete request
     const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const options = {
         method: "DELETE",

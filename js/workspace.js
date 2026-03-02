@@ -43,13 +43,11 @@ async function apiFetch(url, options = {}) {
             
             res = await fetch(url, options);
             
-            // If it STILL returns 401 after refresh, the session is completely dead
             if (res.status === 401) {
                 forceLogout();
                 throw new Error("Session expired.");
             }
         } else {
-            // Refresh failed (e.g., refresh token is expired or missing)
             forceLogout();
             throw new Error("Session expired.");
         }
@@ -58,13 +56,21 @@ async function apiFetch(url, options = {}) {
     return res;
 }
 
-async function fetchJSON(url, headers = {}) {
+// ---------------------------------------------------------
+// FIXED: AUTOMATIC HEADER INJECTION FOR ALL REQUESTS
+// ---------------------------------------------------------
+
+async function fetchJSON(url, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every fetch request
+    const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
 
-async function postJSON(url, body, headers = {}) {
+async function postJSON(url, body, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every post request
+    const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
@@ -74,7 +80,9 @@ async function postJSON(url, body, headers = {}) {
     return res.json();
 }
 
-async function patchJSON(url, body, headers = {}) {
+async function patchJSON(url, body, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every patch request
+    const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...headers },
@@ -84,7 +92,9 @@ async function patchJSON(url, body, headers = {}) {
     return res.json();
 }
 
-async function putJSON(url, body, headers = {}) {
+async function putJSON(url, body, customHeaders = {}) {
+    // Automatically injects Token + Org Slug into every put request
+    const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const res = await apiFetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json", ...headers },
@@ -94,7 +104,9 @@ async function putJSON(url, body, headers = {}) {
     return res.json();
 }
 
-async function deleteJSON(url, headers = {}, body = null) {
+async function deleteJSON(url, customHeaders = {}, body = null) {
+    // Automatically injects Token + Org Slug into every delete request
+    const headers = authHeaders({ "X-ORG-SLUG": state.activeOrgSlug, ...customHeaders });
     const options = {
         method: "DELETE",
         headers: { "Content-Type": "application/json", ...headers }
@@ -106,7 +118,6 @@ async function deleteJSON(url, headers = {}, body = null) {
     if (res.status === 204) return {}; 
     return res.json();
 }
-
 // ==================== SESSION MANAGEMENT ====================
 let isRefreshing = false;
 let refreshPromise = null;
