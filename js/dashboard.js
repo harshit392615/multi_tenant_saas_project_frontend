@@ -43,50 +43,71 @@ function authHeaders(extra = {}) {
     return token ? { Authorization: `Bearer ${token}`, ...extra } : extra;
 }
 
-// Global interceptor: If ANY request returns 401, instantly log the user out
-function check401(res) {
+// Intelligent fetch wrapper that handles 401 retries automatically
+async function apiFetch(url, options = {}) {
+    let res = await fetch(url, options);
+
     if (res.status === 401) {
-        forceLogout();
-        throw new Error("Unauthorized - Session expired.");
+        console.warn("401 Unauthorized. Attempting to refresh token...");
+        const refreshed = await refreshAccessToken();
+        
+        if (refreshed) {
+            // Update the token in headers and retry the original request
+            const newToken = localStorage.getItem("access");
+            options.headers = {
+                ...options.headers,
+                Authorization: `Bearer ${newToken}`
+            };
+            
+            res = await fetch(url, options);
+            
+            // If it STILL returns 401 after refresh, the session is completely dead
+            if (res.status === 401) {
+                forceLogout();
+                throw new Error("Session expired.");
+            }
+        } else {
+            // Refresh failed (e.g., refresh token is expired or missing)
+            forceLogout();
+            throw new Error("Session expired.");
+        }
     }
+
+    return res;
 }
 
 async function fetchJSON(url, headers = {}) {
-    const res = await fetch(url, { headers });
-    check401(res);
+    const res = await apiFetch(url, { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
 
 async function postJSON(url, body, headers = {}) {
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify(body)
     });
-    check401(res);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
 
 async function patchJSON(url, body, headers = {}) {
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify(body)
     });
-    check401(res);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
 
 async function putJSON(url, body, headers = {}) {
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify(body)
     });
-    check401(res);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
@@ -98,8 +119,7 @@ async function deleteJSON(url, headers = {}, body = null) {
     };
     if (body) options.body = JSON.stringify(body);
 
-    const res = await fetch(url, options);
-    check401(res);
+    const res = await apiFetch(url, options);
     if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
     if (res.status === 204) return {}; 
     return res.json();
@@ -932,55 +952,54 @@ function initMiscInteractions() {
     });
 }
 // ==================== SESSION MANAGEMENT ====================
+let isRefreshing = false;
+let refreshPromise = null;
+
 async function refreshAccessToken() {
     const refreshToken = localStorage.getItem("refresh");
+    if (!refreshToken) return false;
+
+    // Prevent multiple simultaneous refresh calls if multiple APIs fail at exactly the same time
+    if (isRefreshing) return refreshPromise;
+
+    isRefreshing = true;
     
-    if (!refreshToken) {
-        console.warn("No refresh token found.");
-        forceLogout();
-        return false;
-    }
+    refreshPromise = (async () => {
+        try {
+            const response = await fetch(`${CONFIG.API_BASE}/auth/refresh/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh: refreshToken })
+            });
 
-    try {
-        const response = await fetch(`${CONFIG.API_BASE}/auth/refresh/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ refresh: refreshToken })
-        });
+            if (!response.ok) return false;
 
-        // If the refresh token itself is expired or invalid
-        if (!response.ok) {
-            throw new Error("Invalid refresh token.");
+            const data = await response.json();
+            
+            // Save new tokens to local storage immediately
+            if (data.access) localStorage.setItem("access", data.access);
+            if (data.refresh) localStorage.setItem("refresh", data.refresh); 
+            
+            console.log("Session refreshed successfully in background.");
+            return true;
+
+        } catch (error) {
+            console.error("Token refresh network error:", error);
+            return false;
+        } finally {
+            isRefreshing = false;
         }
+    })();
 
-        const data = await response.json();
-        
-        // Save new tokens to local storage immediately
-        if (data.access) localStorage.setItem("access", data.access);
-        if (data.refresh) localStorage.setItem("refresh", data.refresh); 
-
-        console.log("Session refreshed successfully.");
-        return true;
-
-    } catch (error) {
-        console.error("Token refresh failed:", error);
-        forceLogout();
-        return false;
-    }
+    return refreshPromise;
 }
 
 function forceLogout() {
-    // Clear all auth data and redirect to login page
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
-    
-    // Optional: Keep workspace/org settings in localStorage so they remember where they were, 
-    // or run localStorage.clear() to wipe everything.
-    
     window.location.href = "login.html"; 
 }
+
 function initTokenAutoRefresh() {
     const EIGHT_MINUTES = 8 * 60 * 1000; // 8 minutes in milliseconds
     
@@ -1087,7 +1106,11 @@ function initBillingInteractions() {
 document.addEventListener("DOMContentLoaded", async () => {
     // 1. Immediately refresh token on page load
     const isValidSession = await refreshAccessToken();
-    if (!isValidSession) return; // Stop execution if session is invalid (forceLogout takes over)
+    if (!isValidSession) {
+        forceLogout();
+        return;}
+     // Stop execution if session is invalid (forceLogout takes over)
+    loadData();
 
     // 2. Initialize UI Components
     initRouter();
@@ -1104,7 +1127,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     setInterval(refreshAccessToken, 8 * 60 * 1000);
 
     // 4. Finally, fetch the real dashboard data securely
-    loadData();
 });
 // ==================== TOPBAR UI & SSE NOTIFICATIONS ====================
 

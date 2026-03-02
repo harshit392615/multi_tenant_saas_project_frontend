@@ -15,11 +15,143 @@ const state = {
     applyingRemote: false
 };
 
-// ==================== API HELPERS ====================
+// ==================== API HELPERS & 401 INTERCEPTOR ====================
 function authHeaders(extra = {}) {
     const token = localStorage.getItem("access");
     return token ? { Authorization: `Bearer ${token}`, ...extra } : extra;
 }
+
+// Intelligent fetch wrapper that handles 401 retries automatically
+async function apiFetch(url, options = {}) {
+    let res = await fetch(url, options);
+
+    if (res.status === 401) {
+        console.warn("401 Unauthorized. Attempting to refresh token...");
+        const refreshed = await refreshAccessToken();
+        
+        if (refreshed) {
+            // Update the token in headers and retry the original request
+            const newToken = localStorage.getItem("access");
+            options.headers = {
+                ...options.headers,
+                Authorization: `Bearer ${newToken}`
+            };
+            
+            res = await fetch(url, options);
+            
+            // If it STILL returns 401 after refresh, the session is completely dead
+            if (res.status === 401) {
+                forceLogout();
+                throw new Error("Session expired.");
+            }
+        } else {
+            // Refresh failed (e.g., refresh token is expired or missing)
+            forceLogout();
+            throw new Error("Session expired.");
+        }
+    }
+
+    return res;
+}
+
+async function fetchJSON(url, headers = {}) {
+    const res = await apiFetch(url, { headers });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+async function postJSON(url, body, headers = {}) {
+    const res = await apiFetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+async function patchJSON(url, body, headers = {}) {
+    const res = await apiFetch(url, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+async function putJSON(url, body, headers = {}) {
+    const res = await apiFetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+}
+
+async function deleteJSON(url, headers = {}, body = null) {
+    const options = {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", ...headers }
+    };
+    if (body) options.body = JSON.stringify(body);
+
+    const res = await apiFetch(url, options);
+    if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
+    if (res.status === 204) return {}; 
+    return res.json();
+}
+
+// ==================== SESSION MANAGEMENT ====================
+let isRefreshing = false;
+let refreshPromise = null;
+
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem("refresh");
+    if (!refreshToken) return false;
+
+    // Prevent multiple simultaneous refresh calls if multiple APIs fail at exactly the same time
+    if (isRefreshing) return refreshPromise;
+
+    isRefreshing = true;
+    
+    refreshPromise = (async () => {
+        try {
+            const response = await fetch(`${CONFIG.API_BASE}/auth/refresh/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh: refreshToken })
+            });
+
+            if (!response.ok) return false;
+
+            const data = await response.json();
+            
+            // Save new tokens to local storage immediately
+            if (data.access) localStorage.setItem("access", data.access);
+            if (data.refresh) localStorage.setItem("refresh", data.refresh); 
+            
+            console.log("Session refreshed successfully in background.");
+            return true;
+
+        } catch (error) {
+            console.error("Token refresh network error:", error);
+            return false;
+        } finally {
+            isRefreshing = false;
+        }
+    })();
+
+    return refreshPromise;
+}
+
+function forceLogout() {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    window.location.href = "login.html"; 
+}
+
 
 // ==================== CARET HELPERS (From your logic) ====================
 function getCaretOffset(el) {
@@ -232,6 +364,7 @@ function setupEditor() {
 
 // ==================== INITIALIZATION & REST ====================
 document.addEventListener("DOMContentLoaded", async () => {
+
     if (!state.noteId) {
         alert("No note ID provided.");
         window.history.back();
