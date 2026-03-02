@@ -1,6 +1,6 @@
 // ==================== CONFIG & STATE ====================
 const CONFIG = {
-    API_BASE: "http://127.0.0.1:8000/api",
+    API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
     COLORS: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899']
 };
 

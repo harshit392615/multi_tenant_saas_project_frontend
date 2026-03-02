@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.className = 'form-status';
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/invites/accept/', {
+                const response = await fetch('https://multi-tenant-saas-project.onrender.com/api/invites/accept/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

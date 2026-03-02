@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/auth/signup/', {
+            const response = await fetch('https://multi-tenant-saas-project.onrender.com/api/auth/signup/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Replace with your actual backend endpoint
-            const response = await fetch(`http://127.0.0.1:8000/api/auth/verify/${uidb64}/${token}/`, {
+            const response = await fetch(`https://multi-tenant-saas-project.onrender.com/api/auth/verify/${uidb64}/${token}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

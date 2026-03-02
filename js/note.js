@@ -1,6 +1,6 @@
 // ==================== CONFIG & STATE ====================
 const CONFIG = {
-    API_BASE: "http://127.0.0.1:8000/api",
+    API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
     // Adjust WS_BASE to wss:// for production
     WS_BASE: "ws://127.0.0.1:8000/ws/notes/" 
 };
