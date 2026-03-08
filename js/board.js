@@ -425,7 +425,7 @@ function initModals() {
         if (confirm("Are you sure you want to delete this card?")) {
             try {
                 // Delete using ID
-                await deleteJSON(`${CONFIG.API_BASE}/card/details/${id}/`);
+                await deleteJSON(`${CONFIG.API_BASE}/card/boards/${id}/delete/`);
                 close();
                 await loadBoardData(state.activeBoardslug);
             } catch (err) { alert("Failed to delete card."); }

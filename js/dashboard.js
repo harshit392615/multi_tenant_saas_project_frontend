@@ -1,3 +1,4 @@
+import { initFCM } from './fcm-client.js';
 // ==================== CONFIG & STATE ====================
 const CONFIG = {
     API_BASE: "https://multi-tenant-saas-project.onrender.com/api",
@@ -255,7 +256,7 @@ async function loadBillingData() {
         state.currentPlan = subData.title ? subData.title.toLowerCase() : 'basic'; 
         console.log("Current subscription data:", subData);
 
-        duration = subData.billing_cycle === "Yearly" ? 365 : subData.billing_cycle === "Monthly" ? 30 : subData.billing_cycle === "unlimited" ? none : 30;
+        const duration = subData.billing_cycle === "Yearly" ? 365 : subData.billing_cycle === "Monthly" ? 30 : subData.billing_cycle === "unlimited" ? none : 30;
         
         // Render the Banner
         document.getElementById('active-plan-name').textContent = state.currentPlan.charAt(0).toUpperCase() + state.currentPlan.slice(1) + " Plan";
@@ -1115,30 +1116,42 @@ function initBillingInteractions() {
     });
 }
 // ==================== INIT ====================
+// dashboard.js
+
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Immediately refresh token on page load
     const isValidSession = await refreshAccessToken();
     if (!isValidSession) {
         forceLogout();
-        return;}
-     // Stop execution if session is invalid (forceLogout takes over)
-     
-     // 2. Initialize UI Components
-     initRouter();
-     initOrgSwitcher();
-     initCreationModals();
-     initSearchAndFilters();
-     initSettingsInteractions();
-     initMiscInteractions();
-     initBillingInteractions();
-     initTopbarAndSSE();
-     initHeartbeat();
-     
-     // 3. Set background auto-refresh interval (every 8 minutes)
-     setInterval(refreshAccessToken, 8 * 60 * 1000);
-     
-     // 4. Finally, fetch the real dashboard data securely
-     loadData();
+        return;
+    }
+    // ==========================================
+    // FCM INITIALIZATION
+    // ==========================================
+    window.handleIncomingNotification = handleIncomingNotification; 
+    
+    console.log("🚀 Starting FCM Registration..."); // ADD THIS to see if we get here
+    initFCM(CONFIG.API_BASE, state.activeOrgSlug);
+
+    // Initialize UI and Heartbeats
+    initRouter();
+    initOrgSwitcher();
+    initCreationModals();
+    initSearchAndFilters();
+    initSettingsInteractions();
+    initMiscInteractions();
+    initBillingInteractions();
+    initTopbarAndSSE();
+    initHeartbeat();
+
+    // Fetch dashboard data
+    // Wrap this in a try/catch so if loadData fails, FCM still tries to run
+    try {
+        await loadData();
+    } catch (e) {
+        console.error("Data load failed, but attempting FCM...", e);
+    }
+
+    
 });
 // ==================== TOPBAR UI & SSE NOTIFICATIONS ====================
 
@@ -1224,6 +1237,7 @@ function initTopbarAndSSE() {
 
     sseConnection.onmessage = (event) => {
         try {
+            if (event.data === "connected") return;
             const data = JSON.parse(event.data);
             handleIncomingNotification(data);
         } catch (e) {
